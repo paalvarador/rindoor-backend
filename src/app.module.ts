@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServicesModule } from './services/services.module';
+import { JobsModule } from './jobs/jobs.module';
+import { UserModule } from './user/user.module';
 import typeOrmConfig from './config/typeorm';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,8 +19,10 @@ import typeOrmConfig from './config/typeorm';
     }),
     CategoryModule,
     ServicesModule,
+    JobsModule,
+    UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
