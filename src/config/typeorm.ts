@@ -17,9 +17,14 @@ const config = {
   logging: true,
   entities: ['dist/**/*.entity{.ts,.js}'],
   migrations: ['dist/migrations/*{.ts,.js}'],
+  ssl: true,
+  extra: {
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  },
 };
 
 export default registerAs('typeorm', () => config);
-
 
 export const connectionSource = new DataSource(config as DataSourceOptions);
