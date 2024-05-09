@@ -20,8 +20,10 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('category')
+@ApiTags('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
