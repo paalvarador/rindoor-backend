@@ -11,6 +11,7 @@ const config = {
   port: process.env.DB_PORT as unknown as number,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
+
   autoLoadEntities: true,
   syncronize: true,
   logging: true,
@@ -19,5 +20,6 @@ const config = {
 };
 
 export default registerAs('typeorm', () => config);
+
 
 export const connectionSource = new DataSource(config as DataSourceOptions);
