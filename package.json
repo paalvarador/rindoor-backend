@@ -26,12 +26,14 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.2",
-
+    "@types/multer": "^1.4.11",
+    "buffer-to-stream": "^1.0.0",
+    "class-validator": "^0.14.1",
+    "cloudinary": "^2.2.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20",
     "uuid": "^9.0.1"
-
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

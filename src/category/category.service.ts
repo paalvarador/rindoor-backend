@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,19 +9,40 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
+import { FileUpload } from 'src/cloudinary/FileUpload';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    private fileUploadService: FileUpload,
   ) {}
-  async create(createCategoryDto: CreateCategoryDto) {
-    if (!createCategoryDto)
+  async create(createCategoryDto: CreateCategoryDto, file) {
+    if (!createCategoryDto && !file)
       throw new BadRequestException('Error to create category');
 
-    const newCategory = await this.categoryRepository.save(createCategoryDto);
-    return newCategory;
+    const findCategory = await this.categoryRepository.findOne({
+      where: { name: createCategoryDto.name },
+    });
+    if (findCategory) throw new ConflictException('Category already exists');
+
+    let imgUrl: string;
+    if (file) {
+      const imgUpload = await this.fileUploadService.uploadImg(file);
+      if (!imgUpload) {
+        throw new BadRequestException('Image upload failed');
+      }
+      imgUrl = imgUpload.url;
+    }
+
+    const newCategory = {
+      name: createCategoryDto.name,
+      description: createCategoryDto.description,
+      img: imgUrl,
+    };
+
+    return await this.categoryRepository.save(newCategory);
   }
 
   async findAll() {
