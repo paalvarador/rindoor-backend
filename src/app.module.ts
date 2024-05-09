@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JobsModule } from './jobs/jobs.module';
 import typeOrmConfig from './config/typeorm';
 
 @Module({
@@ -18,6 +19,7 @@ import typeOrmConfig from './config/typeorm';
         configService.get('typeorm'),
     }),
     CategoryModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
