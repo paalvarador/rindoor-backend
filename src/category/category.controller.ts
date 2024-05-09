@@ -12,6 +12,8 @@ import {
   UploadedFile,
   UseInterceptors,
   UsePipes,
+  ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -53,16 +55,33 @@ export class CategoryController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoryService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(minSizeFile)
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 200000,
+            message: 'Archivo debe ser menor a 200Kb',
+          }),
+          new FileTypeValidator({
+            fileType: /(jpg)|(jpge)|(png)|(webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File | null,
   ) {
-    return this.categoryService.update(id, updateCategoryDto);
+    return this.categoryService.update(id, updateCategoryDto, file);
   }
 
   @Delete(':id')

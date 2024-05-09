@@ -58,13 +58,30 @@ export class CategoryService {
     return findCategory;
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+  async update(id: string, updateCategoryDto: UpdateCategoryDto, file) {
     const findCategory = await this.categoryRepository.findOne({
       where: { id: id },
     });
-    if (!findCategory) throw new NotFoundException('User notFound');
+    if (!findCategory) throw new NotFoundException('Category notFound');
 
-    await this.categoryRepository.update(id, { ...updateCategoryDto });
+    if (findCategory.name === updateCategoryDto.name)
+      throw new ConflictException('Category already exists');
+
+    let imgUrl: string;
+    if (file) {
+      const imgUpload = await this.fileUploadService.uploadImg(file);
+      if (!imgUpload) {
+        throw new BadRequestException('Image upload failed');
+      }
+      imgUrl = imgUpload.url;
+    }
+
+    const updateCategory = {
+      ...updateCategoryDto,
+      imgUrl: imgUrl || findCategory.imgUrl,
+    };
+
+    await this.categoryRepository.update(id, { ...updateCategory });
     return `Category ${findCategory.id} updated`;
   }
 
