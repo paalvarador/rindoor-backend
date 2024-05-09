@@ -40,7 +40,7 @@ export class CategoryController {
             message: 'Archivo debe ser menor a 200Kb',
           }),
           new FileTypeValidator({
-            fileType: /(jpg)|(jpge)|(png)|(webp)$/,
+            fileType: /(jpg)|(jpeg)|(png)|(webp)$/,
           }),
         ],
       }),
