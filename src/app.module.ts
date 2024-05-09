@@ -20,10 +20,7 @@ import typeOrmConfig from './config/typeorm';
       useFactory: (configService: ConfigService) =>
         configService.get('typeorm'),
     }),
-
-    ,
     CategoryModule,
-
   ],
   controllers: [AppController],
   providers: [AppService],
