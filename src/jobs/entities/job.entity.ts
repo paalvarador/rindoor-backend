@@ -1,8 +1,11 @@
 import { Category } from 'src/category/entities/category.entity';
+import { User } from 'src/user/entities/User.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -31,10 +34,14 @@ export class Job {
   @Column({ default: JobStatus.Active })
   status: string;
 
+  @CreateDateColumn()
+  created_at: Date;
+
   @OneToOne(() => Category, (category) => category.job)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  @Column({ type: 'date', nullable: false })
-  created_at: Date;
+  @ManyToOne(() => User, (user) => user.jobs)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
