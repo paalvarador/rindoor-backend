@@ -7,6 +7,9 @@ import { JobsModule } from './jobs/jobs.module';
 import { UserModule } from './user/user.module';
 import { PostulationsModule } from './postulations/postulations.module';
 import typeOrmConfig from './config/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthModule } from './auth/auth.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -23,8 +26,12 @@ import typeOrmConfig from './config/typeorm';
     JobsModule,
     UserModule,
     PostulationsModule,
+    JwtModule.register({
+      global: true,
+      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET,
+    }),
+    AuthModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
