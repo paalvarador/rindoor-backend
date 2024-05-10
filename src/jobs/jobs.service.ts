@@ -60,7 +60,6 @@ export class JobsService {
       relations: { user: true },
     });
     if (!findJob) throw new NotFoundException('Job not found');
-    console.log(findJob.user.role);
 
     if (findJob.user.role !== 'CLIENT')
       throw new BadRequestException('Action just for Clients');
