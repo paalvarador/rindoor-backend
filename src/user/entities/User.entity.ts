@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
 import { Service } from 'src/services/entities/service.entity';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -45,4 +46,7 @@ export class User {
 
   @OneToMany(() => Service, (service) => service.id)
   services: Service[];
+
+  @OneToMany(() => Postulation, (postulations) => postulations.user)
+  postulations: Postulation[];
 }

@@ -1,12 +1,14 @@
 import { Category } from 'src/category/entities/category.entity';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { User } from 'src/user/entities/User.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -25,7 +27,7 @@ export class Job {
   @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'text', nullable: false })
   description: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
@@ -37,11 +39,16 @@ export class Job {
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToOne(() => Category, (category) => category.job)
+  @Index({ unique: false })
+  @ManyToOne(() => Category, (category) => category.job)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
+  @Index({ unique: false })
   @ManyToOne(() => User, (user) => user.jobs)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Postulation, (postulations) => postulations.job)
+  postulations: Postulation[];
 }

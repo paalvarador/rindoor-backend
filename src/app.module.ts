@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServicesModule } from './services/services.module';
 import { JobsModule } from './jobs/jobs.module';
 import { UserModule } from './user/user.module';
+import { PostulationsModule } from './postulations/postulations.module';
 import typeOrmConfig from './config/typeorm';
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import typeOrmConfig from './config/typeorm';
     ServicesModule,
     JobsModule,
     UserModule,
+    PostulationsModule,
   ],
   controllers: [],
   providers: [],

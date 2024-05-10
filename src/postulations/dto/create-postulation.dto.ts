@@ -7,39 +7,23 @@ import {
 } from 'class-validator';
 import { checkDecimal } from 'src/decorators/checkDecimal.decorator';
 
-export class CreateJobDto {
+export class CreatePostulationDto {
   /**
-   * @example 'Limpiar la casa'
-   * @description Nombre del trabajo a realizar
+   * @example 'Mensaje al cliente'
+   * @description 'Mensaje a cliente'
    */
   @IsNotEmpty()
   @IsString()
-  name: string;
+  message: string;
 
   /**
-   * @example 'Descripcion del trabajo'
-   * @description Detalles del trabajo
-   */
-  @IsNotEmpty()
-  @IsString()
-  description: string;
-
-  /**
-   * @example 'Precio Base'
-   * @description Precio Base del trabajo
+   * @example 'Precio ofrecido'
+   * @description Precio ofrecido del trabajo
    */
   @IsNotEmpty()
   @IsPositive()
   @Validate(checkDecimal)
-  base_price: number;
-
-  /**
-   * @example '18908870-475e-42e1-9620-588c38221377'
-   * @description ID de categoria
-   */
-  @IsNotEmpty()
-  @IsUUID()
-  categoryId: string;
+  offered_price: number;
 
   /**
    * @example '18908870-475e-42e1-9620-588c38221377'
@@ -48,4 +32,12 @@ export class CreateJobDto {
   @IsNotEmpty()
   @IsUUID()
   userId: string;
+
+  /**
+   * @example '18908870-475e-42e1-9620-588c38221377'
+   * @description ID de job
+   */
+  @IsNotEmpty()
+  @IsUUID()
+  jobId: string;
 }
