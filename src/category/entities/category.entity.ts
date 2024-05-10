@@ -1,12 +1,6 @@
 import { Job } from 'src/jobs/entities/job.entity';
 import { Service } from 'src/services/entities/service.entity';
-import {
-  Column,
-  Entity,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ name: 'categories' })
@@ -27,7 +21,7 @@ export class Category {
   })
   img: string;
 
-  @OneToOne(() => Job, (job) => job.category)
+  @OneToMany(() => Job, (job) => job.category)
   job: Job;
 
   @OneToMany(() => Service, (service) => service.category)

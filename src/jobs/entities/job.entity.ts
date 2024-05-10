@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -25,7 +27,7 @@ export class Job {
   @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'text', nullable: false })
   description: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
@@ -37,10 +39,12 @@ export class Job {
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToOne(() => Category, (category) => category.job)
+  @Index({ unique: false })
+  @ManyToOne(() => Category, (category) => category.job)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
+  @Index({ unique: false })
   @ManyToOne(() => User, (user) => user.jobs)
   @JoinColumn({ name: 'user_id' })
   user: User;
