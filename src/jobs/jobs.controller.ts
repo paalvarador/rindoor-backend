@@ -7,11 +7,20 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpCode,
+  UseInterceptors,
+  UsePipes,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { minSizeFile } from 'src/pipes/minSizeFile';
+import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -49,8 +58,28 @@ export class JobsController {
     description: 'Endpoint to create a new Job',
   })
   @Post()
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobsService.create(createJobDto);
+  @UseInterceptors(modifyJob)
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(minSizeFile)
+  create(
+    @Body() createJobDto: CreateJobDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 200000,
+            message: 'Archivo debe ser menor a 200Kb',
+          }),
+          new FileTypeValidator({
+            fileType: /(jpg)|(jpeg)|(png)|(webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.jobsService.create(createJobDto, file);
   }
 
   @HttpCode(200)
