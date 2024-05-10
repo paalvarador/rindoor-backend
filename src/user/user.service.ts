@@ -32,13 +32,17 @@ export class UserService {
     return await this.userRepository.find();
   }
 
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   async findOne(id: string) {
-    const findCategory = await this.userRepository.findOne({
+    const findUser = await this.userRepository.findOne({
       where: { id: id },
     });
-    if (!findCategory) throw new NotFoundException('Category not found');
+    if (!findUser) throw new NotFoundException('User not found');
 
-    return findCategory;
+    return findUser;
   }
 
   async update(id: string, updateCategoryDto: UpdateUserDto) {
