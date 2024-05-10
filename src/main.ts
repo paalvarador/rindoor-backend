@@ -9,7 +9,7 @@ async function bootstrap() {
   const configSwagger = new DocumentBuilder()
     .setTitle('Rindoor API')
     .setDescription(
-      'Rindoor is a platform that allows you to find the best professionals to fixe your  home problems.',
+      'Rindoor is a platform that allows you to find the best professionals to fix your  home problems.',
     )
     .setVersion('1.0')
     .addTag('rindoor')

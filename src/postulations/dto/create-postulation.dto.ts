@@ -9,7 +9,7 @@ import { checkDecimal } from 'src/decorators/checkDecimal.decorator';
 
 export class CreatePostulationDto {
   /**
-   * @example 'Mensaje al cliente'
+   * @example 'Reparar Nevera'
    * @description 'Mensaje a cliente'
    */
   @IsNotEmpty()
@@ -17,7 +17,7 @@ export class CreatePostulationDto {
   message: string;
 
   /**
-   * @example 'Precio ofrecido'
+   * @example '20.23'
    * @description Precio ofrecido del trabajo
    */
   @IsNotEmpty()
