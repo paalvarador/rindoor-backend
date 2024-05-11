@@ -7,12 +7,17 @@ import {
   Param,
   Delete,
   HttpCode,
+  UseGuards,
 } from '@nestjs/common';
 import { PostulationsService } from './postulations.service';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { exampleCreatedPostulation } from './swaggerExample/postulation.swagger';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/user/entities/Role.enum';
+import { GuardToken } from 'src/guards/token.guard';
+import { guardRoles } from 'src/guards/role.guard';
 
 @Controller('postulations')
 @ApiTags('postulations')
@@ -45,7 +50,10 @@ export class PostulationsController {
     status: 400,
     description: 'Action just for PROFESSIONAL',
   })
+  @ApiBearerAuth()
   @Post()
+  @Roles(Role.PROFESSIONAL)
+  @UseGuards(GuardToken, guardRoles)
   create(@Body() createPostulationDto: CreatePostulationDto) {
     return this.postulationsService.create(createPostulationDto);
   }
@@ -83,7 +91,10 @@ export class PostulationsController {
     status: 404,
     description: 'Postulation not found',
   })
+  @ApiBearerAuth()
   @Delete(':id')
+  @Roles(Role.PROFESSIONAL)
+  @UseGuards(GuardToken, guardRoles)
   remove(@Param('id') id: string) {
     return this.postulationsService.remove(id);
   }
