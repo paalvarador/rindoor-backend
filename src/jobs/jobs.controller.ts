@@ -8,12 +8,27 @@ import {
   ParseUUIDPipe,
   HttpCode,
   Query,
+  UseInterceptors,
+  UsePipes,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { minSizeFile } from 'src/pipes/minSizeFile';
+import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -50,9 +65,57 @@ export class JobsController {
     summary: 'Create a new Job',
     description: 'Endpoint to create a new Job',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        name: { type: 'string', description: 'Nombre del trabajo' },
+        description: {
+          type: 'string',
+          description: 'Breve descripcion del trabajo',
+        },
+        base_price: {
+          type: 'number',
+          description: 'Precio base de postulacion',
+        },
+        categoryId: {
+          type: 'string',
+          description: 'Categoria del trabajo',
+        },
+        userId: {
+          type: 'string',
+          description: 'ID de Usuario',
+        },
+      },
+    },
+    required: false,
+  })
   @Post()
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobsService.create(createJobDto);
+  @UseInterceptors(modifyJob)
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(minSizeFile)
+  create(
+    @Body() createJobDto: CreateJobDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 200000,
+            message: 'Archivo debe ser menor a 200Kb',
+          }),
+          new FileTypeValidator({
+            fileType: /(jpg)|(jpeg)|(png)|(webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    console.log(createJobDto);
+    return this.jobsService.create(createJobDto, file);
   }
 
   @HttpCode(200)

@@ -5,10 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from './entities/job.entity';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { CloudinaryConfig } from 'src/config/cloudinaryConfig';
+import { FileUpload } from 'src/cloudinary/FileUpload';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job, User, Category])],
   controllers: [JobsController],
-  providers: [JobsService],
+  providers: [JobsService, FileUpload, CloudinaryConfig],
 })
 export class JobsModule {}

@@ -91,7 +91,7 @@ export class CategoryService {
 
     const updateCategory = {
       ...updateCategoryDto,
-      imgUrl: imgUrl || findCategory.img,
+      img: imgUrl || findCategory.img,
     };
 
     await this.categoryRepository.update(id, { ...updateCategory });

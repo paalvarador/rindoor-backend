@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { FileUpload } from 'src/cloudinary/FileUpload';
 
 @Injectable()
 export class JobsService {
@@ -18,9 +19,10 @@ export class JobsService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    private fileUploadService: FileUpload,
   ) {}
 
-  async create(createJobDto: CreateJobDto) {
+  async create(createJobDto: CreateJobDto, file) {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
@@ -33,11 +35,24 @@ export class JobsService {
     });
     if (!foundCategory) throw new NotFoundException('Category not found');
 
+    let imgUrl: string;
+    if (file) {
+      const imgUpload = await this.fileUploadService.uploadImg(file);
+      if (!imgUpload) {
+        throw new BadRequestException('Image upload failed');
+      }
+      imgUrl = imgUpload.url;
+    }
+    console.log(createJobDto);
+    console.log(file);
+
     const newJob = {
       ...createJobDto,
       category: foundCategory,
       user: foundUser,
+      img: imgUrl,
     };
+    console.log(newJob, 'created');
     return await this.jobRepository.save(newJob);
   }
 
