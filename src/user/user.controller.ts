@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './entities/User.entity';
@@ -19,6 +20,11 @@ import {
   exampleCreatedUser,
 } from './swaggerExamples/User.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from './entities/Role.enum';
+import { GuardToken } from 'src/guards/token.guard';
+import { guardRoles } from 'src/guards/role.guard';
+import { GuardToken2 } from 'src/guards/token2.guard';
 
 @Controller('users')
 @ApiTags('users')
@@ -94,6 +100,8 @@ export class UserController {
   }
 
   @Put('/:id')
+  @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  @UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
     status: 200,
     description: 'The record has been successfully updated.',
@@ -123,11 +131,14 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @Param('id') id: string,
   ): Promise<string> {
+    console.log(updateUserDto);
     const updatedUser = await this.userService.update(id, updateUserDto);
     return updatedUser;
   }
 
   @Delete('/:id')
+  @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  @UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
     status: 204,
     description: 'The record has been successfully deleted.',

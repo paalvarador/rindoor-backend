@@ -9,7 +9,7 @@ import { checkDecimal } from 'src/decorators/checkDecimal.decorator';
 
 export class CreateJobDto {
   /**
-   * @example 'Limpiar la casa'
+   * @example 'Limpiar la casa 3'
    * @description Nombre del trabajo a realizar
    */
   @IsNotEmpty()
@@ -25,7 +25,7 @@ export class CreateJobDto {
   description: string;
 
   /**
-   * @example 'Precio Base'
+   * @example '20.23'
    * @description Precio Base del trabajo
    */
   @IsNotEmpty()
@@ -34,7 +34,7 @@ export class CreateJobDto {
   base_price: number;
 
   /**
-   * @example '18908870-475e-42e1-9620-588c38221377'
+   * @example "36fda476-60ba-4da8-ae02-c9c1d9c3abf8"
    * @description ID de categoria
    */
   @IsNotEmpty()

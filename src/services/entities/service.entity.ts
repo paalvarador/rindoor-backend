@@ -24,11 +24,11 @@ export class Service {
   description: string;
 
   // Relation Many to One (Una categoria puede tener muchos servicios)
-  @ManyToOne(() => Category, (category) => category.id)
+  @ManyToOne(() => Category, (category) => category.services)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.services)
   @JoinColumn({ name: 'user_id' })
   user: User;
 }

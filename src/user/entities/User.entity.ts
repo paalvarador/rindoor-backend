@@ -44,7 +44,7 @@ export class User {
   @OneToMany(() => Job, (job) => job.user)
   jobs: Job[];
 
-  @OneToMany(() => Service, (service) => service.id)
+  @OneToMany(() => Service, (service) => service.user)
   services: Service[];
 
   @OneToMany(() => Postulation, (postulations) => postulations.user)
