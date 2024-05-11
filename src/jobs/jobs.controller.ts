@@ -7,11 +7,13 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -63,8 +65,13 @@ export class JobsController {
     description: 'Endpoint to find all Jobs',
   })
   @Get()
-  findAll() {
-    return this.jobsService.findAll();
+  findAll(@Query() pagination?: PaginationQuery) {
+    return this.jobsService.findAll(pagination);
+  }
+
+  @Get('category')
+  filterByCategory(@Body() category: any) {
+    return this.jobsService.filterByCategory(category);
   }
 
   @HttpCode(200)

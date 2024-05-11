@@ -8,6 +8,7 @@ import { UpdateServiceDto } from './dto/update-service.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from './entities/service.entity';
 import { Repository } from 'typeorm';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Injectable()
 export class ServicesService {
@@ -20,8 +21,20 @@ export class ServicesService {
     return await this.servicesRepository.save(createServiceDto);
   }
 
-  async findAll() {
-    return await this.servicesRepository.find();
+  async findAll(pagination?: PaginationQuery) {
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    console.log(defaultLimit, defaultPage);
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const services = await this.servicesRepository.find();
+
+    const sliceProducts = services.slice(startIndex, endIndex);
+    return sliceProducts;
   }
 
   async findOne(id: string) {
