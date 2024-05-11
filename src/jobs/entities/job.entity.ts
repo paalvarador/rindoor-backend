@@ -36,10 +36,10 @@ export class Job {
   @Column({ default: JobStatus.Active })
   status: string;
 
-  @Column({
-    type: 'varchar',
-  })
-  img: string;
+  // @Column({
+  //   type: 'varchar',
+  // })
+  // img: string;
 
   @CreateDateColumn()
   created_at: Date;

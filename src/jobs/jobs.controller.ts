@@ -16,7 +16,13 @@ import {
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
@@ -57,6 +63,33 @@ export class JobsController {
     summary: 'Create a new Job',
     description: 'Endpoint to create a new Job',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        name: { type: 'string', description: 'Nombre del trabajo' },
+        description: {
+          type: 'string',
+          description: 'Breve descripcion del trabajo',
+        },
+        base_price: {
+          type: 'number',
+          description: 'Precio base de postulacion',
+        },
+        categoryId: {
+          type: 'string',
+          description: 'Categoria del trabajo',
+        },
+        userId: {
+          type: 'string',
+          description: 'ID de Usuario',
+        },
+      },
+    },
+    required: false,
+  })
   @Post()
   @UseInterceptors(modifyJob)
   @UseInterceptors(FileInterceptor('file'))
@@ -79,6 +112,7 @@ export class JobsController {
     )
     file: Express.Multer.File,
   ) {
+    console.log(createJobDto);
     return this.jobsService.create(createJobDto, file);
   }
 

@@ -20,11 +20,27 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { exampleCreatedCategory } from './swaggerExample/category.swagger';
 
 @Controller('category')
 @ApiTags('category')
+@ApiResponse({
+  status: 500,
+  description: 'Internal server error',
+  schema: {
+    example: {
+      statusCode: 500,
+      message: 'Internal server error',
+    },
+  },
+})
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -43,6 +59,17 @@ export class CategoryController {
   @ApiResponse({
     status: 409,
     description: 'Category already exists',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        name: { type: 'string', description: 'Nombre de Cagegoria' },
+        description: { type: 'string', description: 'Nombre de Cagegoria' },
+      },
+    },
   })
   @Post()
   @UseInterceptors(FileInterceptor('file'))
@@ -116,6 +143,18 @@ export class CategoryController {
   @ApiOperation({
     summary: 'update category',
     description: 'Endpoint to update a category',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+        name: { type: 'string', description: 'Nombre de Cagegoria' },
+        description: { type: 'string', description: 'Nombre de Cagegoria' },
+      },
+    },
+    required: false,
   })
   @Put(':id')
   @UseInterceptors(FileInterceptor('file'))
