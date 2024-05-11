@@ -9,6 +9,7 @@ import { User } from './entities/User.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { Role } from './entities/Role.enum';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Injectable()
 export class UserService {
@@ -28,8 +29,18 @@ export class UserService {
     return newUser;
   }
 
-  async findAll() {
-    return await this.userRepository.find();
+  async findAll(pagination?: PaginationQuery) {
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const users = await this.userRepository.find();
+   
+    const sliceProducts = users.slice(startIndex, endIndex);
+    return sliceProducts;
   }
 
   async findByEmail(email: string) {

@@ -1,6 +1,15 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { PostulationsService } from './postulations.service';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Controller('postulations')
 export class PostulationsController {
@@ -12,8 +21,8 @@ export class PostulationsController {
   }
 
   @Get()
-  findAll() {
-    return this.postulationsService.findAll();
+  findAll(@Query() pagination?: PaginationQuery) {
+    return this.postulationsService.findAll(pagination);
   }
 
   @Get(':id')
