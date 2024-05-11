@@ -14,10 +14,12 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  UseGuards,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
@@ -29,6 +31,10 @@ import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
 import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/user/entities/Role.enum';
+import { GuardToken } from 'src/guards/token.guard';
+import { guardRoles } from 'src/guards/role.guard';
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -92,7 +98,10 @@ export class JobsController {
     },
     required: false,
   })
+  @ApiBearerAuth()
   @Post()
+  @Roles(Role.CLIENT)
+  @UseGuards(GuardToken, guardRoles)
   @UseInterceptors(modifyJob)
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
@@ -128,6 +137,8 @@ export class JobsController {
     description: 'Endpoint to find all Jobs',
   })
   @Get()
+  @Roles(Role.CLIENT)
+  @UseGuards(GuardToken, guardRoles)
   findAll(@Query() pagination?: PaginationQuery) {
     return this.jobsService.findAll(pagination);
   }
@@ -155,6 +166,18 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'Job deleted',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Job not found',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.CLIENT)
+  @UseGuards(GuardToken, guardRoles)
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.remove(id);
