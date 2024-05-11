@@ -137,6 +137,8 @@ export class UserController {
   }
 
   @Delete('/:id')
+  @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  @UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
     status: 204,
     description: 'The record has been successfully deleted.',
