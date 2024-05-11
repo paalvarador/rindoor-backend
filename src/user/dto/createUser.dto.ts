@@ -63,5 +63,5 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @IsEnum(Role)
-  role: Role.CLIENT | Role.ADMIN;
+  role: Role.CLIENT | Role.PROFESSIONAL;
 }

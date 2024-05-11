@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { FileUpload } from 'src/cloudinary/FileUpload';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Injectable()
 export class CategoryService {
@@ -45,8 +46,20 @@ export class CategoryService {
     return await this.categoryRepository.save(newCategory);
   }
 
-  async findAll() {
-    return await this.categoryRepository.find();
+  async findAll(pagination?: PaginationQuery) {
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    console.log(defaultLimit, defaultPage);
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const categories = await this.categoryRepository.find();
+
+    const sliceProducts = categories.slice(startIndex, endIndex);
+    return sliceProducts;
   }
 
   async findOne(id: string) {

@@ -14,6 +14,7 @@ import {
   ParseUUIDPipe,
   Put,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -28,6 +29,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { exampleCreatedCategory } from './swaggerExample/category.swagger';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Controller('category')
 @ApiTags('category')
@@ -105,8 +107,8 @@ export class CategoryController {
     description: 'Endpoint to find all Category',
   })
   @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  findAll(@Query() pagination?: PaginationQuery) {
+    return this.categoryService.findAll(pagination);
   }
 
   @HttpCode(200)

@@ -9,6 +9,7 @@ import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileUpload } from 'src/cloudinary/FileUpload';
 
 @Injectable()
@@ -55,8 +56,37 @@ export class JobsService {
     return await this.jobRepository.save(newJob);
   }
 
-  async findAll() {
-    return await this.jobRepository.find();
+  async findAll(pagination?: PaginationQuery) {
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    console.log(defaultLimit, defaultPage);
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const jobs = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    const sliceProducts = jobs.slice(startIndex, endIndex);
+    return sliceProducts;
+  }
+
+  async filterByCategory(category) {
+    const filterCategory = Object.values(category)[0];
+    const findJob = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    const filterJob = await findJob.filter(
+      (job) => job.category.name === filterCategory,
+    );
+
+    if (filterJob.length === 0) return { message: 'No jobs for this category' };
+
+    return filterJob;
   }
 
   async findOne(id: string) {

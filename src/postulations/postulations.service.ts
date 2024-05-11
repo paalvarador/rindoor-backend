@@ -9,6 +9,7 @@ import { Postulation } from './entities/postulation.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Job } from 'src/jobs/entities/job.entity';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Injectable()
 export class PostulationsService {
@@ -44,8 +45,17 @@ export class PostulationsService {
     return await this.postulationRepository.save(newPostulation);
   }
 
-  async findAll() {
-    return await this.postulationRepository.find();
+  async findAll(pagination?: PaginationQuery) {
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const postulations = await this.postulationRepository.find();
+    const sliceProducts = postulations.slice(startIndex, endIndex);
+    return sliceProducts;
   }
 
   async findOne(id: string) {

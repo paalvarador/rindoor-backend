@@ -7,8 +7,9 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
-import { UserService } from './category.service';
+import { UserService } from './user.service';
 import { User } from './entities/User.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
@@ -17,6 +18,7 @@ import {
   alreadyExistsEmail,
   exampleCreatedUser,
 } from './swaggerExamples/User.swagger';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -41,8 +43,8 @@ export class UserController {
     },
   })
   @Get()
-  async findAll(): Promise<User[]> {
-    const usersDB = await this.userService.findAll();
+  async findAll(@Query() pagination?: PaginationQuery): Promise<User[]> {
+    const usersDB = await this.userService.findAll(pagination);
     return usersDB;
   }
 

@@ -7,6 +7,7 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpCode,
+  Query,
   UseInterceptors,
   UsePipes,
   UploadedFile,
@@ -24,6 +25,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
 import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
@@ -126,8 +128,13 @@ export class JobsController {
     description: 'Endpoint to find all Jobs',
   })
   @Get()
-  findAll() {
-    return this.jobsService.findAll();
+  findAll(@Query() pagination?: PaginationQuery) {
+    return this.jobsService.findAll(pagination);
+  }
+
+  @Get('category')
+  filterByCategory(@Body() category: any) {
+    return this.jobsService.filterByCategory(category);
   }
 
   @HttpCode(200)
