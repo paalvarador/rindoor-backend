@@ -53,6 +53,7 @@ export class ServicesController {
     status: 409,
     description: 'Service already exists',
   })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
