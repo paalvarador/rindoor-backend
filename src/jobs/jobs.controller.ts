@@ -14,6 +14,7 @@ import { CreateJobDto } from './dto/create-job.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { filterJobCategory } from 'src/dto/filterJob.dto';
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -70,8 +71,11 @@ export class JobsController {
   }
 
   @Get('category')
-  filterByCategory(@Body() category: any) {
-    return this.jobsService.filterByCategory(category);
+  filterByCategory(
+    @Body() category: filterJobCategory,
+    @Query() pagination?: PaginationQuery,
+  ) {
+    return this.jobsService.filterByCategory(category, pagination);
   }
 
   @HttpCode(200)

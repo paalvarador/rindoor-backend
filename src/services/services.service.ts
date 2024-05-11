@@ -33,8 +33,8 @@ export class ServicesService {
 
     const services = await this.servicesRepository.find();
 
-    const sliceProducts = services.slice(startIndex, endIndex);
-    return sliceProducts;
+    const sliceServices = services.slice(startIndex, endIndex);
+    return sliceServices;
   }
 
   async findOne(id: string) {
