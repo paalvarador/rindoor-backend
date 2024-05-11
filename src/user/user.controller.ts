@@ -100,7 +100,7 @@ export class UserController {
   }
 
   @Put('/:id')
-  @Roles(Role.CLIENT)
+  @Roles(Role.CLIENT, Role.PROFESSIONAL)
   @UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
     status: 200,

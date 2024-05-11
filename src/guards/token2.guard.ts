@@ -30,7 +30,7 @@ export class GuardToken2 implements CanActivate {
 
       console.log(payload, 'prueba');
       if (userId === payload.id) return true;
-      throw new UnauthorizedException('User just can change your info');
+      throw new UnauthorizedException('User just can change own info');
     } catch (error) {
       throw new UnauthorizedException('Invalid Token' + error.message);
     }
