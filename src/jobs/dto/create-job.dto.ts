@@ -34,12 +34,12 @@ export class CreateJobDto {
   base_price: number;
 
   /**
-   * @example 'Electricidad'
-   * @description Nombre de categoria
+   * @example '18908870-475e-42e1-9620-588c38221377'
+   * @description ID de categoria
    */
   @IsNotEmpty()
-  @IsString()
-  category: string;
+  @IsUUID()
+  categoryId: string;
 
   /**
    * @example '18908870-475e-42e1-9620-588c38221377'

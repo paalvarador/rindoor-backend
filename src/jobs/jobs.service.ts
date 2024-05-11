@@ -28,7 +28,7 @@ export class JobsService {
       throw new BadRequestException('Action just for Clients');
 
     const foundCategory = await this.categoryRepository.findOne({
-      where: { name: createJobDto.category },
+      where: { id: createJobDto.categoryId },
     });
     if (!foundCategory) throw new NotFoundException('Category not found');
 
