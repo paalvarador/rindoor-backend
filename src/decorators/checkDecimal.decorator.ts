@@ -9,8 +9,12 @@ import {
 export class checkDecimal implements ValidatorConstraintInterface {
   validate(value: any, validationArguments?: ValidationArguments) {
     console.log(typeof value);
-    const decimal = value.toString().split('.');
-    if (decimal[1].length <= 2) return true;
+    // const decimal = value.toString().split('.');
+    // if (decimal[1].length <= 2) return true;
+    if (!/^\d+(\.\d{1,2})?$/.test(value)) {
+      return false;
+    }
+    return true;
   }
 
   defaultMessage?(validationArguments?: ValidationArguments): string {
