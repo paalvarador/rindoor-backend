@@ -100,8 +100,8 @@ export class JobsController {
   })
   @ApiBearerAuth()
   @Post()
-  @Roles(Role.CLIENT)
-  @UseGuards(GuardToken, guardRoles)
+  // @Roles(Role.CLIENT)
+  // @UseGuards(GuardToken, guardRoles)
   @UseInterceptors(modifyJob)
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
@@ -176,8 +176,8 @@ export class JobsController {
     description: 'Job not found',
   })
   @ApiBearerAuth()
-  @Roles(Role.CLIENT)
-  @UseGuards(GuardToken, guardRoles)
+  // @Roles(Role.CLIENT)
+  // @UseGuards(GuardToken, guardRoles)
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.remove(id);
