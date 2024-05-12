@@ -6,7 +6,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
+  app.enableCors({
+    origin: 'http://localhost:3000',
+  });
   const configSwagger = new DocumentBuilder()
     .setTitle('Rindoor API')
     .setDescription(
