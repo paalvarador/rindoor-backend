@@ -13,7 +13,7 @@ export class minSizeFile implements PipeTransform {
     const minSize = 5000;
 
     if (value.size < minSize) {
-      throw new BadRequestException('Size must be greater than 20000');
+      throw new BadRequestException('Archivo debe ser mayor a 5Kb');
     }
     return value;
   }

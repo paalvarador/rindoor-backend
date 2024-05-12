@@ -7,17 +7,33 @@ import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Service } from './entities/service.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { Category } from 'src/category/entities/category.entity';
+import { User } from 'src/user/entities/User.entity';
 
 @Injectable()
 export class ServicesService {
   constructor(
     @InjectRepository(Service)
     private servicesRepository: Repository<Service>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   async create(createServiceDto: CreateServiceDto) {
+    const categoryDB = await this.categoryRepository.findOneBy({
+      id: createServiceDto.categoryId,
+    });
+    if (!categoryDB) throw new NotFoundException('Categoria no encontrada');
+
+    const userDB = await this.userRepository.findOneBy({
+      id: createServiceDto.userId,
+    });
+    if (!userDB) throw new NotFoundException('Usuario no encontrado');
+
     return await this.servicesRepository.save(createServiceDto);
   }
 
@@ -38,9 +54,11 @@ export class ServicesService {
   }
 
   async findOne(id: string) {
-    return await this.servicesRepository.findOne({
+    const serviceDB =  await this.servicesRepository.findOne({
       where: { id },
     });
+    if(!serviceDB) throw new NotFoundException('Servicio no encontrado');
+    return serviceDB;
   }
 
   async update(id: string, updateServiceDto: UpdateServiceDto) {
