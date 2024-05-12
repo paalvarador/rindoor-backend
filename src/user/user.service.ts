@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,7 +9,6 @@ import { Repository } from 'typeorm';
 import { User } from './entities/User.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { Role } from './entities/Role.enum';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 
 @Injectable()
@@ -18,12 +18,11 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    if (!createUserDto)
-      throw new BadRequestException('Error to create category');
+    if (!createUserDto) throw new BadRequestException('Usuario es requerido');
     const userDB = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     });
-    if (userDB) throw new BadRequestException('User already exists');
+    if (userDB) throw new ConflictException('Usuario ya existe');
     const userToSave = { ...createUserDto, rating: 5.0 };
     const newUser = await this.userRepository.save(userToSave);
     return newUser;
@@ -44,14 +43,16 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOne({ where: { email } });
+    const userDB = await this.userRepository.findOne({ where: { email } });
+    if (!userDB) throw new NotFoundException('Usuario no encontrado');
+    return userDB;
   }
 
   async findOne(id: string) {
     const findUser = await this.userRepository.findOne({
       where: { id: id },
     });
-    if (!findUser) throw new NotFoundException('User not found');
+    if (!findUser) throw new NotFoundException('Usuario no encontrado');
 
     return findUser;
   }
@@ -60,19 +61,19 @@ export class UserService {
     const foundUser = await this.userRepository.findOne({
       where: { id: id },
     });
-    if (!foundUser) throw new NotFoundException('User notFound');
+    if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
     await this.userRepository.update(id, { ...updateCategoryDto });
-    return `Category ${foundUser.id} updated`;
+    return `Usuario actualizado`;
   }
 
   async remove(id: string) {
     const foundUser = await this.userRepository.findOne({
       where: { id: id },
     });
-    if (!foundUser) throw new NotFoundException('Category not found');
+    if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
     await this.userRepository.delete(foundUser);
-    return `${foundUser.email} is deleted`;
+    return `Usuario eliminado`;
   }
 }

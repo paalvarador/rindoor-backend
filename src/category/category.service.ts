@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -21,18 +23,21 @@ export class CategoryService {
   ) {}
   async create(createCategoryDto: CreateCategoryDto, file) {
     if (!createCategoryDto && !file)
-      throw new BadRequestException('Error to create category');
+      throw new BadRequestException('Error al crear la categoria');
 
     const findCategory = await this.categoryRepository.findOne({
       where: { name: createCategoryDto.name },
     });
-    if (findCategory) throw new ConflictException('Category already exists');
+    if (findCategory) throw new ConflictException('Categoria ya existe');
 
     let imgUrl: string;
     if (file) {
       const imgUpload = await this.fileUploadService.uploadImg(file);
       if (!imgUpload) {
-        throw new BadRequestException('Image upload failed');
+        throw new HttpException(
+          'Error al subir la imagen',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
       }
       imgUrl = imgUpload.url;
     }
@@ -66,7 +71,7 @@ export class CategoryService {
     const findCategory = await this.categoryRepository.findOne({
       where: { id: id },
     });
-    if (!findCategory) throw new NotFoundException('Category not found');
+    if (!findCategory) throw new NotFoundException('Categoria no encontrada');
 
     return findCategory;
   }
@@ -75,16 +80,19 @@ export class CategoryService {
     const findCategory = await this.categoryRepository.findOne({
       where: { id: id },
     });
-    if (!findCategory) throw new NotFoundException('Category notFound');
+    if (!findCategory) throw new NotFoundException('Categoria no encontrada');
 
     if (findCategory.name === updateCategoryDto.name)
-      throw new ConflictException('Category already exists');
+      throw new ConflictException('Categoria ya existe');
 
     let imgUrl: string;
     if (file) {
       const imgUpload = await this.fileUploadService.uploadImg(file);
       if (!imgUpload) {
-        throw new BadRequestException('Image upload failed');
+        throw new HttpException(
+          'Error al subir la imagen',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
       }
       imgUrl = imgUpload.url;
     }
@@ -95,16 +103,16 @@ export class CategoryService {
     };
 
     await this.categoryRepository.update(id, { ...updateCategory });
-    return `Category ${findCategory.id} updated`;
+    return `Categoria ${findCategory.name} actualizada`;
   }
 
   async remove(id: string) {
     const findCategory = await this.categoryRepository.findOne({
       where: { id: id },
     });
-    if (!findCategory) throw new NotFoundException('Category not found');
+    if (!findCategory) throw new NotFoundException('Categoria no encontrada');
 
     await this.categoryRepository.delete(findCategory);
-    return `${findCategory.name} is deleted`;
+    return `${findCategory.name} eliminada`;
   }
 }
