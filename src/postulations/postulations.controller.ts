@@ -52,8 +52,8 @@ export class PostulationsController {
   })
   @ApiBearerAuth()
   @Post()
-  @Roles(Role.PROFESSIONAL)
-  @UseGuards(GuardToken, guardRoles)
+  // @Roles(Role.PROFESSIONAL)
+  // @UseGuards(GuardToken, guardRoles)
   create(@Body() createPostulationDto: CreatePostulationDto) {
     return this.postulationsService.create(createPostulationDto);
   }
@@ -93,8 +93,8 @@ export class PostulationsController {
   })
   @ApiBearerAuth()
   @Delete(':id')
-  @Roles(Role.PROFESSIONAL)
-  @UseGuards(GuardToken, guardRoles)
+  // @Roles(Role.PROFESSIONAL)
+  // @UseGuards(GuardToken, guardRoles)
   remove(@Param('id') id: string) {
     return this.postulationsService.remove(id);
   }

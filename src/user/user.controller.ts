@@ -132,8 +132,8 @@ export class UserController {
   }
 
   @Put('/:id')
-  @Roles(Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
+  // @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  // @UseGuards(GuardToken2, guardRoles)
   @ApiBearerAuth()
   @ApiUnauthorizedResponse()
   @ApiResponse({
@@ -186,8 +186,8 @@ export class UserController {
   }
 
   @Delete('/:id')
-  @Roles(Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
+  // @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  // @UseGuards(GuardToken2, guardRoles)
   @ApiUnauthorizedResponse()
   @ApiBearerAuth()
   @ApiResponse({
