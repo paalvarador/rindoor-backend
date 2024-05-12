@@ -80,10 +80,10 @@ export class UserController {
     summary: 'Listar todos los usuarios',
     description: 'Lista todos los usuarios en la base de datos',
   })
-  @Roles(Role.ADMIN)
-  @UseGuards(GuardToken2, guardRoles)
-  @ApiUnauthorizedResponse()
-  @ApiBearerAuth()
+  // @Roles(Role.ADMIN)
+  //@UseGuards(GuardToken2, guardRoles)
+  //@ApiUnauthorizedResponse()
+  //@ApiBearerAuth()
   @Get()
   async findAll(@Query() pagination?: PaginationQuery): Promise<User[]> {
     const usersDB = await this.userService.findAll(pagination);
@@ -121,10 +121,10 @@ export class UserController {
     summary: 'Encontrar usuario por ID',
     description: 'Encuentra un usuario por su ID',
   })
-  @Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
-  @ApiUnauthorizedResponse()
-  @ApiBearerAuth()
+  //@Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
+  //@UseGuards(GuardToken2, guardRoles)
+  //@ApiUnauthorizedResponse()
+  //@ApiBearerAuth()
   @Get('/:id')
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     const user = await this.userService.findOne(id);
@@ -134,8 +134,8 @@ export class UserController {
   @Put('/:id')
   // @Roles(Role.CLIENT, Role.PROFESSIONAL)
   // @UseGuards(GuardToken2, guardRoles)
-  @ApiBearerAuth()
-  @ApiUnauthorizedResponse()
+  //  @ApiBearerAuth()
+  //@ApiUnauthorizedResponse()
   @ApiResponse({
     status: 200,
     description: 'Usuario actualizado',
@@ -188,8 +188,8 @@ export class UserController {
   @Delete('/:id')
   // @Roles(Role.CLIENT, Role.PROFESSIONAL)
   // @UseGuards(GuardToken2, guardRoles)
-  @ApiUnauthorizedResponse()
-  @ApiBearerAuth()
+  //@ApiUnauthorizedResponse()
+  //@ApiBearerAuth()
   @ApiResponse({
     status: 204,
     description: 'Usuario eliminado',

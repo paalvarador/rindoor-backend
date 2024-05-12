@@ -13,7 +13,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('rindoor')
-    .addBearerAuth()
+    //.addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('api', app, document);

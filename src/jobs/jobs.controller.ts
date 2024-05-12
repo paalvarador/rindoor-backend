@@ -37,7 +37,6 @@ import { Role } from 'src/user/entities/Role.enum';
 import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
 
-
 @Controller('jobs')
 @ApiTags('jobs')
 @ApiResponse({
@@ -100,7 +99,7 @@ export class JobsController {
     },
     required: false,
   })
-  @ApiBearerAuth()
+  //@ApiBearerAuth()
   @Post()
   // @Roles(Role.CLIENT)
   // @UseGuards(GuardToken, guardRoles)
@@ -139,8 +138,8 @@ export class JobsController {
     description: 'Endpoint to find all Jobs',
   })
   @Get()
-  @Roles(Role.CLIENT)
-  @UseGuards(GuardToken, guardRoles)
+  // @Roles(Role.CLIENT)
+  //@UseGuards(GuardToken, guardRoles)
   findAll(@Query() pagination?: PaginationQuery) {
     return this.jobsService.findAll(pagination);
   }
@@ -180,7 +179,7 @@ export class JobsController {
     status: 404,
     description: 'Job not found',
   })
-  @ApiBearerAuth()
+  //  @ApiBearerAuth()
   // @Roles(Role.CLIENT)
   // @UseGuards(GuardToken, guardRoles)
   @Delete(':id')
