@@ -3,10 +3,12 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
+  Length,
   Matches,
   MaxLength,
 } from 'class-validator';
 import { Role } from '../entities/Role.enum';
+import { OmitType, PickType } from '@nestjs/swagger';
 
 export class CreateUserDto {
   /**
@@ -42,7 +44,7 @@ export class CreateUserDto {
    */
   @IsString()
   @IsNotEmpty()
-  @MaxLength(10)
+  @Length(10)
   @Matches(/^[0-9]{10}$/, { message: 'Phone number must be 10 digits' })
   phone: string;
 
@@ -58,10 +60,10 @@ export class CreateUserDto {
   /**
    * @example 'CLIENT'
    * @description Role of the user
-   * @enum {Role}
+   * @default 'CLIENT'
    */
   @IsString()
   @IsNotEmpty()
-  @IsEnum(Role)
+  @IsEnum({ enum: ['CLIENT', 'PROFESSIONAL'] })
   role: Role.CLIENT | Role.PROFESSIONAL;
 }
