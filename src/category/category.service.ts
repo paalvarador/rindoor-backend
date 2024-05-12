@@ -63,8 +63,8 @@ export class CategoryService {
 
     const categories = await this.categoryRepository.find();
 
-    const sliceProducts = categories.slice(startIndex, endIndex);
-    return sliceProducts;
+    const sliceCategories = categories.slice(startIndex, endIndex);
+    return sliceCategories;
   }
 
   async findOne(id: string) {

@@ -54,8 +54,8 @@ export class PostulationsService {
     const endIndex = startIndex + defaultLimit;
 
     const postulations = await this.postulationRepository.find();
-    const sliceProducts = postulations.slice(startIndex, endIndex);
-    return sliceProducts;
+    const slicePostulations = postulations.slice(startIndex, endIndex);
+    return slicePostulations;
   }
 
   async findOne(id: string) {

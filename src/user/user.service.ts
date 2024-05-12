@@ -38,8 +38,8 @@ export class UserService {
 
     const users = await this.userRepository.find();
 
-    const sliceProducts = users.slice(startIndex, endIndex);
-    return sliceProducts;
+    const sliceUsers = users.slice(startIndex, endIndex);
+    return sliceUsers;
   }
 
   async findByEmail(email: string) {

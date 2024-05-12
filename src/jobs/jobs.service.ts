@@ -70,15 +70,23 @@ export class JobsService {
       relations: { category: true },
     });
 
-    const sliceProducts = jobs.slice(startIndex, endIndex);
-    return sliceProducts;
+    const sliceJobs = jobs.slice(startIndex, endIndex);
+    return sliceJobs;
   }
 
-  async filterByCategory(category) {
+  async filterByCategory(category, pagination) {
     const filterCategory = Object.values(category)[0];
     const findJob = await this.jobRepository.find({
       relations: { category: true },
     });
+
+    //*Paginado
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
 
     const filterJob = await findJob.filter(
       (job) => job.category.name === filterCategory,
@@ -86,7 +94,8 @@ export class JobsService {
 
     if (filterJob.length === 0) return { message: 'No jobs for this category' };
 
-    return filterJob;
+    const sliceJobs = filterJob.slice(startIndex, endIndex);
+    return sliceJobs;
   }
 
   async findOne(id: string) {

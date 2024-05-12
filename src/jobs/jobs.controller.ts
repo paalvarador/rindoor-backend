@@ -28,6 +28,7 @@ import {
 } from '@nestjs/swagger';
 import { exampleCreatedJob } from './swaggerExamples/job.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { filterJobCategory } from 'src/dto/filterJob.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { minSizeFile } from 'src/pipes/minSizeFile';
 import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
@@ -35,6 +36,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/user/entities/Role.enum';
 import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
+
 
 @Controller('jobs')
 @ApiTags('jobs')
@@ -144,8 +146,11 @@ export class JobsController {
   }
 
   @Get('category')
-  filterByCategory(@Body() category: any) {
-    return this.jobsService.filterByCategory(category);
+  filterByCategory(
+    @Body() category: filterJobCategory,
+    @Query() pagination?: PaginationQuery,
+  ) {
+    return this.jobsService.filterByCategory(category, pagination);
   }
 
   @HttpCode(200)
