@@ -99,8 +99,8 @@ export class CategoryController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
-  @Roles(Role.ADMIN)
-  @UseGuards(GuardToken2, guardRoles)
+  // @Roles(Role.ADMIN)
+  // @UseGuards(GuardToken2, guardRoles)
   create(
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile(
@@ -134,16 +134,16 @@ export class CategoryController {
     summary: 'Listar todas las categorias',
     description: 'Endpoint para listar todas las categorias',
   })
-  @Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
+  // @Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
+  // @UseGuards(GuardToken2, guardRoles)
   @Get()
   findAll(@Query() pagination?: PaginationQuery) {
     return this.categoryService.findAll(pagination);
   }
 
   @HttpCode(200)
-  @Roles(Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
+  //@Roles(Role.CLIENT, Role.PROFESSIONAL)
+  //@UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
     status: 200,
     description: 'Categoria encontrada',
@@ -162,8 +162,8 @@ export class CategoryController {
     summary: 'Encontrar categoria por ID',
     description: 'Endpoint para encontrar una categoria por ID',
   })
-  @Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
-  @UseGuards(GuardToken2, guardRoles)
+  // @Roles(Role.ADMIN, Role.CLIENT, Role.PROFESSIONAL)
+  //@UseGuards(GuardToken2, guardRoles)
   @Get(':id')
   @ApiParam(categoryParamId)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
@@ -221,8 +221,8 @@ export class CategoryController {
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
   @ApiParam(categoryParamId)
-  @Roles(Role.ADMIN)
-  @UseGuards(GuardToken2, guardRoles)
+  //@Roles(Role.ADMIN)
+  // @UseGuards(GuardToken2, guardRoles)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -264,8 +264,8 @@ export class CategoryController {
     summary: 'Eliminar categoria',
     description: 'Endpoint para eliminar una categoria',
   })
-  @Roles(Role.ADMIN)
-  @UseGuards(GuardToken2, guardRoles)
+  //@Roles(Role.ADMIN)
+  //@UseGuards(GuardToken2, guardRoles)
   @ApiParam(categoryParamId)
   @Delete(':id')
   remove(@Param('id') id: string) {
