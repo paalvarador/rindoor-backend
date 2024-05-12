@@ -50,7 +50,7 @@ export class PostulationsController {
     status: 400,
     description: 'Action just for PROFESSIONAL',
   })
-  @ApiBearerAuth()
+  //@ApiBearerAuth()
   @Post()
   // @Roles(Role.PROFESSIONAL)
   // @UseGuards(GuardToken, guardRoles)
@@ -91,7 +91,7 @@ export class PostulationsController {
     status: 404,
     description: 'Postulation not found',
   })
-  @ApiBearerAuth()
+  // @ApiBearerAuth()
   @Delete(':id')
   // @Roles(Role.PROFESSIONAL)
   // @UseGuards(GuardToken, guardRoles)
