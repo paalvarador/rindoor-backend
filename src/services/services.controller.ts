@@ -9,6 +9,7 @@ import {
   HttpCode,
   Put,
   UseGuards,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ServicesService } from './services.service';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -19,6 +20,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -37,7 +39,7 @@ import { userValidationsErrors } from 'src/user/swaggerExamples/User.swagger';
 @Controller('services')
 @ApiTags('Servicios')
 // @ApiBearerAuth()
-// @ApiResponse(internalServerError)
+@ApiResponse(internalServerError)
 export class ServicesController {
   constructor(private readonly servicesService: ServicesService) {}
 
@@ -93,14 +95,14 @@ export class ServicesController {
 
   @ApiResponse({
     status: 200,
-    description: 'Find all Services',
+    description: 'Lista de servicios',
     schema: {
       example: [exampleCreatedService],
     },
   })
   @ApiOperation({
-    summary: 'Find all Services',
-    description: 'Endpoint to find all Services',
+    summary: 'Listar servicios',
+    description: 'Endpoint para listar servicios',
   })
   @Get()
   findAll(@Query() pagination?: PaginationQuery) {
@@ -110,71 +112,107 @@ export class ServicesController {
   @HttpCode(200)
   @ApiResponse({
     status: 200,
-    description: 'Encontrar servicio por ID',
+    description: 'Encuentra un servicio por ID',
     schema: {
       example: exampleCreatedService,
     },
   })
   @ApiResponse(serviceNotFound)
   @ApiOperation({
-    summary: 'Find sergice by ID',
-    description: 'Endpoint to find service by ID',
+    summary: 'Encontrar servicio por ID',
+    description: 'Endpoint para encontrar un servicio por ID',
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.servicesService.findOne(id);
   }
 
-  // TODO implementar la actualización de un servicio
   @HttpCode(200)
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken2, guardRoles)
   @ApiResponse({
-    status: 200,
-    description: 'Service updated',
+    status: 201,
+    description: 'Servicio actualizado',
+    schema: {
+      example: exampleCreatedService,
+    },
   })
-  @ApiResponse(serviceNotFound)
+  @ApiResponse({
+    status: 400,
+    description: 'Error de validación',
+    schema: {
+      example: userValidationsErrors,
+    },
+  })
   @ApiResponse({
     status: 409,
-    description: 'Service already exists',
+    description: 'Servicio ya existe',
   })
-  @ApiOperation({
-    summary: 'update service',
-    description: 'Endpoint to update a service',
+  @ApiResponse({
+    status: 404,
+    description: 'Categoria, usuario o servicio no encontrados',
+    schema: {
+      example: [
+        {
+          message: 'Categoria no encontrada',
+        },
+        {
+          message: 'Usuario no encontrado',
+        },
+        {
+          message: 'Servicio no encontrado',
+        },
+      ],
+    },
   })
-  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: 'Nombre del servicio' },
-        description: {
-          type: 'string',
-          description: 'Descripción del servicio',
-        },
-        categoryId: {
-          type: 'string',
-          description: 'Id de la categoria a la que pertenece el servicio',
-        },
-      },
+      ...userApiBody,
+      required: [],
     },
-    required: false,
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Actualizar Servicio',
+    description: 'Endpoint para actualizar un servicio',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id del servicio',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
+  update(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() updateServiceDto: UpdateServiceDto,
+  ) {
     return this.servicesService.update(id, updateServiceDto);
   }
 
-  @HttpCode(200)
+  @HttpCode(204)
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken2, guardRoles)
+  @ApiResponse({
+    status: 204,
+    description: 'Servicio eliminado',
+  })
   @ApiResponse({
     status: 404,
-    description: 'Service not found',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Service deleted',
+    description: 'Servicio no encontrado',
+    schema: {
+      example: {
+        message: 'Servicio no encontrado',
+      },
+    },
   })
   @ApiOperation({
-    summary: 'Delete Service',
-    description: 'Endpoint to delete a service',
+    summary: 'Eliminar Servicio',
+    description: 'Endpoint para eliminar un servicio',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Id del servicio',
+    example: '123e4567-e89b-12d3-a456-426614174000',
   })
   @Delete(':id')
   remove(@Param('id') id: string) {
