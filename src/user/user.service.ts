@@ -31,7 +31,7 @@ export class UserService {
   async findAll(pagination?: PaginationQuery) {
     const { page, limit } = pagination;
     const defaultPage = page || 1;
-    const defaultLimit = limit || 5;
+    const defaultLimit = limit || 10;
 
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
