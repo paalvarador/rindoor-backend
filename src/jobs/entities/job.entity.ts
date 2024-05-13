@@ -30,7 +30,16 @@ export class Job {
   @Column({ type: 'text', nullable: false })
   description: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: false })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: false,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   base_price: number;
 
   @Column({ default: JobStatus.Active })
