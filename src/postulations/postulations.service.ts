@@ -26,16 +26,16 @@ export class PostulationsService {
       where: { id: createPostulationDto.userId },
     });
     if (!findUser) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('Usuario no encontrado');
     }
 
     if (findUser.role !== 'PROFESSIONAL')
-      throw new BadRequestException('Action just for PROFESSIONAL');
+      throw new BadRequestException('Acesso solo para los Profesionales');
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
     });
-    if (!findJob) throw new NotFoundException('Job not found');
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
     const newPostulation = {
       ...createPostulationDto,
@@ -79,6 +79,6 @@ export class PostulationsService {
       throw new BadRequestException('Actions just for PROFESSIONAL');
 
     await this.postulationRepository.remove(findPostulation);
-    return `This action removes a #${id} postulation`;
+    return `Postulacion con id: ${id} eliminada`;
   }
 }

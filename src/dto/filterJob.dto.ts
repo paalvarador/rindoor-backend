@@ -8,27 +8,31 @@ import {
 } from 'class-validator';
 import { PaginationQuery } from './pagintation.dto';
 import { Transform } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class filterJobCategory extends PaginationQuery {
-  /**
-   * @example ['Fontaneria', 'Electricidad', 'Carpinteria']
-   */
-  @IsNotEmpty({ each: true })
+  @ApiPropertyOptional({
+    type: [String],
+    description: 'lista de categorias',
+    example: ['Fontaneria', 'Electricidad', 'Carpinteria'],
+  })
   @IsString({ each: true })
   @IsOptional()
   categories: string[];
 
   /**
-   * @example 100.00
+   * @example 0.00
+   * @description precio minimo
    */
   @IsNumber()
   @IsOptional()
-  @Min(0)
+  @Min(0.0)
   @Transform(({ value }) => Number(value))
   minPrice?: number;
 
   /**
    * @example 10000.00
+   * @description precio maximo
    */
   @IsNumber()
   @IsOptional()

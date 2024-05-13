@@ -4,18 +4,15 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe());
-  app.enableCors({
-    origin: 'http://localhost:3000',
-  });
+
   const configSwagger = new DocumentBuilder()
     .setTitle('Rindoor API')
     .setDescription(
-      'Rindoor is a platform that allows you to find the best professionals to fix your  home problems.',
+      'Rindoor es una plataforma que te permite encontrar a los mejores profesionales para solucionar los problemas de tu hogar.',
     )
     .setVersion('1.0')
-    .addTag('rindoor')
     //.addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);
