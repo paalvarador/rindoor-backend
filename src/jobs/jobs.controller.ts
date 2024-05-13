@@ -26,7 +26,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { exampleCreatedJob } from './swaggerExamples/job.swagger';
+import { exampleCreatedJob, jobApiBody } from './swaggerExamples/job.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { filterJobCategory } from 'src/dto/filterJob.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -36,19 +36,11 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/user/entities/Role.enum';
 import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
+import { internalServerError } from 'src/utils/swagger.utils';
 
 @Controller('jobs')
 @ApiTags('jobs')
-@ApiResponse({
-  status: 500,
-  description: 'Internal server error',
-  schema: {
-    example: {
-      statusCode: 500,
-      message: 'Internal server error',
-    },
-  },
-})
+@ApiResponse(internalServerError)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
@@ -74,29 +66,7 @@ export class JobsController {
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: { type: 'string', format: 'binary' },
-        name: { type: 'string', description: 'Nombre del trabajo' },
-        description: {
-          type: 'string',
-          description: 'Breve descripcion del trabajo',
-        },
-        base_price: {
-          type: 'number',
-          description: 'Precio base de postulacion',
-        },
-        categoryId: {
-          type: 'string',
-          description: 'Categoria del trabajo',
-        },
-        userId: {
-          type: 'string',
-          description: 'ID de Usuario',
-        },
-      },
-    },
+    ...jobApiBody,
     required: false,
   })
   //@ApiBearerAuth()
@@ -140,8 +110,8 @@ export class JobsController {
   @Get()
   // @Roles(Role.CLIENT)
   //@UseGuards(GuardToken, guardRoles)
-  findAll(@Query() pagination?: PaginationQuery) {
-    return this.jobsService.findAll(pagination);
+  findAll(@Query() filter?: filterJobCategory) {
+    return this.jobsService.findAll(filter);
   }
 
   @Get('category')

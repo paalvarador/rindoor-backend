@@ -11,6 +11,7 @@ import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileUpload } from 'src/cloudinary/FileUpload';
+import { filterJobCategory } from 'src/dto/filterJob.dto';
 
 @Injectable()
 export class JobsService {
@@ -56,10 +57,13 @@ export class JobsService {
     return await this.jobRepository.save(newJob);
   }
 
-  async findAll(pagination?: PaginationQuery) {
-    const { page, limit } = pagination;
+  async findAll(filter?: filterJobCategory) {
+    const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
     const defaultLimit = limit || 5;
+    const defaultCategories = categories || [];
+    const defaultMinPrice = minPrice || 0;
+    const defaultMaxPrice = maxPrice || 999999999.99;
 
     console.log(defaultLimit, defaultPage);
 
@@ -71,7 +75,14 @@ export class JobsService {
     });
 
     const sliceJobs = jobs.slice(startIndex, endIndex);
-    return sliceJobs;
+    const filterJobs = sliceJobs.filter(
+      (job) =>
+        job.base_price >= defaultMinPrice &&
+        job.base_price <= defaultMaxPrice &&
+        (defaultCategories.length === 0 ||
+          defaultCategories.includes(job.category.name)),
+    );
+    return filterJobs;
   }
 
   async filterByCategory(category, pagination) {
