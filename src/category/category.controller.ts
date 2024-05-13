@@ -51,7 +51,7 @@ import { Roles } from 'src/decorators/role.decorator';
 @Controller('category')
 @ApiTags('Categorias')
 @ApiResponse(internalServerError)
-@ApiBearerAuth()
+// @ApiBearerAuth()
 @ApiUnauthorizedResponse()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

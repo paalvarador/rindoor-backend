@@ -23,10 +23,18 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { exampleCreatedJob, jobApiBody } from './swaggerExamples/job.swagger';
+import {
+  exampleCreatedJob,
+  jobApiBody,
+  jobNotFound,
+  jobParamId,
+  jobServiceUnavailable,
+  validationErrorsJob,
+} from './swaggerExamples/job.swagger';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { filterJobCategory } from 'src/dto/filterJob.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -37,37 +45,67 @@ import { Role } from 'src/user/entities/Role.enum';
 import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
+import { error } from 'console';
 
 @Controller('jobs')
-@ApiTags('jobs')
+@ApiTags('Trabajos')
 @ApiResponse(internalServerError)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
-  @HttpCode(201)
   @ApiResponse({
     status: 201,
-    description: 'The record  has been successfully created.',
+    description: 'Trabajo creado',
     schema: {
       example: exampleCreatedJob,
     },
   })
   @ApiResponse({
     status: 404,
-    description: 'User Not Found, Category Not Found',
+    description: 'Usuario o Categoria no encontrada',
+    schema: {
+      example: [
+        {
+          message: 'Usuario no encontrado',
+        },
+        {
+          message: 'Categoria no encontrada',
+        },
+      ],
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Action Just For Clients',
+    description: 'Error de validación',
+    schema: {
+      example: validationErrorsJob,
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+    schema: {
+      example: {
+        message: 'Accesso solo para los Clientes',
+        error: 'Unauthorized',
+        statusCode: 401,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 503,
+    description: 'Error al subir la imagen',
+    schema: {
+      example: jobServiceUnavailable,
+    },
   })
   @ApiOperation({
-    summary: 'Create a new Job',
-    description: 'Endpoint to create a new Job',
+    summary: 'Crear un Trabajo',
+    description: 'Endpoint para crear un Trabajo',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     ...jobApiBody,
-    required: false,
   })
   //@ApiBearerAuth()
   @Post()
@@ -94,18 +132,20 @@ export class JobsController {
     )
     file: Express.Multer.File,
   ) {
-    console.log(createJobDto);
     return this.jobsService.create(createJobDto, file);
   }
 
   @HttpCode(200)
   @ApiResponse({
     status: 200,
-    description: 'find all Jobs',
+    description: 'Listar Trabajos',
+    schema: {
+      example: [exampleCreatedJob],
+    },
   })
   @ApiOperation({
-    summary: 'Find all Jobs',
-    description: 'Endpoint to find all Jobs',
+    summary: 'Listar Trabajos',
+    description: 'Endpoint para listar los Trabajos',
   })
   @Get()
   // @Roles(Role.CLIENT)
@@ -114,40 +154,37 @@ export class JobsController {
     return this.jobsService.findAll(filter);
   }
 
-  @Get('category')
-  filterByCategory(
-    @Body() category: filterJobCategory,
-    @Query() pagination?: PaginationQuery,
-  ) {
-    return this.jobsService.filterByCategory(category, pagination);
-  }
-
-  @HttpCode(200)
   @ApiResponse({
     status: 200,
-    description: 'All Jobs find Success',
+    description: 'Trabajo encontrado',
+    schema: {
+      example: exampleCreatedJob,
+    },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Job not found',
-  })
+  @ApiResponse(jobNotFound)
   @ApiOperation({
-    summary: 'Find Job By ID',
-    description: 'Endpoint to find a Job by ID',
+    summary: 'Encontrar un Trabajo por ID',
+    description: 'Endpoint to encontrar un Trabajo por ID',
   })
+  @ApiParam(jobParamId)
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.findOne(id);
   }
 
-  @HttpCode(200)
+  @HttpCode(204)
   @ApiResponse({
-    status: 200,
-    description: 'Job deleted',
+    status: 204,
+    description: 'Trabajo eliminado',
+    schema: {
+      example: 'Trabajo con id: 5e9d7f4d-7b1f-4d6c-8e0d-4b7e6f7b1b4d eliminado',
+    },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Job not found',
+  @ApiResponse(jobNotFound)
+  @ApiParam(jobParamId)
+  @ApiOperation({
+    summary: 'Eliminar un Trabajo por ID',
+    description: 'Endpoint para eliminar un Trabajo por ID',
   })
   //  @ApiBearerAuth()
   // @Roles(Role.CLIENT)

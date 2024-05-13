@@ -12,87 +12,130 @@ import {
 import { PostulationsService } from './postulations.service';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { exampleCreatedPostulation } from './swaggerExample/postulation.swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  exampleCreatedPostulation,
+  postulationApiParam,
+  postulationJobUserNotFound,
+  postulationNotFound,
+  postulationValidationsErrors,
+} from './swaggerExample/postulation.swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/user/entities/Role.enum';
 import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
+import { internalServerError } from 'src/utils/swagger.utils';
+import e from 'express';
+import { error } from 'console';
 
 @Controller('postulations')
-@ApiTags('postulations')
+@ApiTags('Postulaciones')
+@ApiResponse(internalServerError)
 @ApiResponse({
-  status: 500,
-  description: 'Internal server error',
+  status: 401,
+  description: 'Acceso solo para los Profesionales',
   schema: {
     example: {
-      statusCode: 500,
-      message: 'Internal server error',
+      message: 'Acesso solo para los Profesionales',
+      error: 'Unauthorized',
+      statusCode: 401,
     },
   },
 })
 export class PostulationsController {
   constructor(private readonly postulationsService: PostulationsService) {}
 
-  @HttpCode(201)
   @ApiResponse({
     status: 201,
-    description: 'The postulation  has been successfully created.',
+    description: 'Postulación creada',
     schema: {
       example: exampleCreatedPostulation,
     },
   })
   @ApiResponse({
     status: 404,
-    description: 'User not found or Job not found',
+    description: 'Usuario o trabajo no encontrado',
+    schema: {
+      example: postulationJobUserNotFound,
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Action just for PROFESSIONAL',
+    description: 'Error de validación',
+    schema: {
+      example: postulationValidationsErrors,
+    },
+  })
+  @ApiOperation({
+    summary: 'Crear postulación',
+    description: 'Crea una postulación a un trabajo',
   })
   // @ApiBearerAuth()
-  @Post()
   // @Roles(Role.PROFESSIONAL)
   // @UseGuards(GuardToken, guardRoles)
+  @Post()
   create(@Body() createPostulationDto: CreatePostulationDto) {
     return this.postulationsService.create(createPostulationDto);
   }
 
-  @HttpCode(200)
   @ApiResponse({
     status: 200,
-    description: 'find all postulations',
+    description: 'Listar postulaciones',
+    schema: {
+      example: [exampleCreatedPostulation],
+    },
+  })
+  @ApiOperation({
+    summary: 'Listar postulaciones',
+    description: 'Lista todas las postulaciones',
   })
   @Get()
   findAll(@Query() pagination?: PaginationQuery) {
     return this.postulationsService.findAll(pagination);
   }
 
-  @HttpCode(200)
   @ApiResponse({
     status: 200,
-    description: 'Postulation found',
+    description: 'Postulación encontrada',
+    schema: {
+      example: exampleCreatedPostulation,
+    },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Postulation not found',
+  @ApiResponse(postulationNotFound)
+  @ApiParam(postulationApiParam)
+  @ApiOperation({
+    summary: 'Buscar postulación',
+    description: 'Busca una postulación por su id',
   })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postulationsService.findOne(id);
   }
 
-  @HttpCode(200)
+  @HttpCode(204)
   @ApiResponse({
-    status: 200,
-    description: 'Postulation deleted',
+    status: 204,
+    description: 'Postulación eliminada',
+    schema: {
+      example: {
+        message: `Postulacion con id: ${exampleCreatedPostulation.id} eliminada`,
+      },
+    },
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Postulation not found',
+  @ApiResponse(postulationNotFound)
+  @ApiParam(postulationApiParam)
+  @ApiOperation({
+    summary: 'Eliminar postulación',
+    description: 'Elimina una postulación por su id',
   })
-  // @ApiBearerAuth()
   @Delete(':id')
+  // @ApiBearerAuth()
   // @Roles(Role.PROFESSIONAL)
   // @UseGuards(GuardToken, guardRoles)
   remove(@Param('id') id: string) {

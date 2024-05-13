@@ -1,7 +1,10 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -27,25 +30,26 @@ export class JobsService {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
-    if (!foundUser) throw new NotFoundException('User not found');
+    if (!foundUser) throw new NotFoundException('Usuario not found');
     if (foundUser.role !== 'CLIENT')
-      throw new BadRequestException('Action just for Clients');
+      throw new UnauthorizedException('Accesso solo para los Clientes');
 
     const foundCategory = await this.categoryRepository.findOne({
       where: { id: createJobDto.categoryId },
     });
-    if (!foundCategory) throw new NotFoundException('Category not found');
+    if (!foundCategory) throw new NotFoundException('Categoria no encontrada');
 
     let imgUrl: string;
     if (file) {
       const imgUpload = await this.fileUploadService.uploadImg(file);
       if (!imgUpload) {
-        throw new BadRequestException('Image upload failed');
+        throw new HttpException(
+          'Error al subir la imagen',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
       }
       imgUrl = imgUpload.url;
     }
-    console.log(createJobDto);
-    console.log(file);
 
     const newJob = {
       ...createJobDto,
@@ -53,7 +57,6 @@ export class JobsService {
       user: foundUser,
       img: imgUrl,
     };
-    console.log(newJob, 'created');
     return await this.jobRepository.save(newJob);
   }
 
@@ -65,8 +68,6 @@ export class JobsService {
     const defaultMinPrice = minPrice || 0;
     const defaultMaxPrice = maxPrice || 999999999.99;
 
-    console.log(defaultLimit, defaultPage);
-
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
@@ -75,6 +76,7 @@ export class JobsService {
     });
 
     const sliceJobs = jobs.slice(startIndex, endIndex);
+
     const filterJobs = sliceJobs.filter(
       (job) =>
         job.base_price >= defaultMinPrice &&
@@ -82,31 +84,8 @@ export class JobsService {
         (defaultCategories.length === 0 ||
           defaultCategories.includes(job.category.name)),
     );
+
     return filterJobs;
-  }
-
-  async filterByCategory(category, pagination) {
-    const filterCategory = Object.values(category)[0];
-    const findJob = await this.jobRepository.find({
-      relations: { category: true },
-    });
-
-    //*Paginado
-    const { page, limit } = pagination;
-    const defaultPage = page || 1;
-    const defaultLimit = limit || 5;
-
-    const startIndex = (defaultPage - 1) * defaultLimit;
-    const endIndex = startIndex + defaultLimit;
-
-    const filterJob = await findJob.filter(
-      (job) => job.category.name === filterCategory,
-    );
-
-    if (filterJob.length === 0) return { message: 'No jobs for this category' };
-
-    const sliceJobs = filterJob.slice(startIndex, endIndex);
-    return sliceJobs;
   }
 
   async findOne(id: string) {
@@ -114,7 +93,7 @@ export class JobsService {
       where: { id: id },
       relations: { user: true },
     });
-    if (!findJob) throw new NotFoundException('Job not found');
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
     return findJob;
   }
@@ -124,12 +103,12 @@ export class JobsService {
       where: { id: id },
       relations: { user: true },
     });
-    if (!findJob) throw new NotFoundException('Job not found');
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
     if (findJob.user.role !== 'CLIENT')
       throw new BadRequestException('Action just for Clients');
 
     await this.jobRepository.remove(findJob);
-    return `Job ${id} deleted successfully`;
+    return `Trabajo con id: ${id} eliminado`;
   }
 }

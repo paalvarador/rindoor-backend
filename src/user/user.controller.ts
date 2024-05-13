@@ -207,6 +207,10 @@ export class UserController {
       },
     },
   })
+  @ApiOperation({
+    summary: 'Eliminar un usuario',
+    description: 'Elimina un usuario de la base de datos',
+  })
   @HttpCode(204)
   async remove(@Param('id') id: string): Promise<string> {
     const deletedUser = await this.userService.remove(id);

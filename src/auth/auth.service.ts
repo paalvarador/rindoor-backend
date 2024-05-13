@@ -13,9 +13,8 @@ export class AuthService {
   async signIn(email: string) {
     const user = await this.userService.findByEmail(email);
 
-    console.log(`user: ${user}`);
 
-    if (!user) throw new BadRequestException('User not found');
+    if (!user) throw new BadRequestException('Usuario no encontrado');
 
     const userPayload = {
       sub: user.id,
@@ -34,11 +33,11 @@ export class AuthService {
 
     const user = await this.userService.findByEmail(email);
 
-    if (user) throw new BadRequestException('Email already exists');
+    if (user) throw new BadRequestException('Usuario ya existe');
 
     const newUser = await this.userService.create(createUserDto);
 
-    if (!newUser) throw new BadRequestException('Could not create user');
+    if (!newUser) throw new BadRequestException('Registro fallido');
 
     return newUser;
   }
