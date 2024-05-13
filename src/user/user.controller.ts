@@ -63,7 +63,7 @@ export class UserController {
     summary: 'Crear un usuario',
     description: 'Crea un usuario en la base de datos',
   })
-  @Post('register')
+  @Post()
   async registerUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     console.log(createUserDto);
     const user = await this.userService.create(createUserDto);
