@@ -54,7 +54,7 @@ export class CategoryService {
   async findAll(pagination?: PaginationQuery) {
     const { page, limit } = pagination;
     const defaultPage = page || 1;
-    const defaultLimit = limit || 5;
+    const defaultLimit = limit || 50;
 
     console.log(defaultLimit, defaultPage);
 

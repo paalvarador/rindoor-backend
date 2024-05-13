@@ -10,7 +10,7 @@ export class PaginationQuery {
   @ApiProperty({
     description: 'Cantidad de elementos a mostrar',
   })
-  limit?: number = 5;
+  limit?: number = 10;
 
   @IsNumber()
   @IsPositive()

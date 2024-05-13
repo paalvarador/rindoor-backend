@@ -40,7 +40,7 @@ export class ServicesService {
   async findAll(pagination?: PaginationQuery) {
     const { page, limit } = pagination;
     const defaultPage = page || 1;
-    const defaultLimit = limit || 5;
+    const defaultLimit = limit || 10;
 
     console.log(defaultLimit, defaultPage);
 
@@ -54,10 +54,10 @@ export class ServicesService {
   }
 
   async findOne(id: string) {
-    const serviceDB =  await this.servicesRepository.findOne({
+    const serviceDB = await this.servicesRepository.findOne({
       where: { id },
     });
-    if(!serviceDB) throw new NotFoundException('Servicio no encontrado');
+    if (!serviceDB) throw new NotFoundException('Servicio no encontrado');
     return serviceDB;
   }
 

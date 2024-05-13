@@ -63,7 +63,7 @@ export class JobsService {
   async findAll(filter?: filterJobCategory) {
     const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
-    const defaultLimit = limit || 5;
+    const defaultLimit = limit || 10;
     const defaultCategories = categories || [];
     const defaultMinPrice = minPrice || 0;
     const defaultMaxPrice = maxPrice || 999999999.99;
