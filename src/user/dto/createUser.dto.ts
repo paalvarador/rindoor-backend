@@ -7,9 +7,12 @@ import {
   Matches,
   MaxLength,
 } from 'class-validator';
-import { Role } from '../entities/Role.enum';
+//import { Role } from '../entities/Role.enum';
 import { OmitType, PickType } from '@nestjs/swagger';
-
+export enum Role {
+  CLIENT = 'CLIENT',
+  PROFESSIONAL = 'PROFESSIONAL',
+}
 export class CreateUserDto {
   /**
    * @example 'Maria'
@@ -64,6 +67,5 @@ export class CreateUserDto {
    */
   @IsString()
   @IsNotEmpty()
-  @IsEnum({ enum: ['CLIENT', 'PROFESSIONAL'] })
   role: Role.CLIENT | Role.PROFESSIONAL;
 }
