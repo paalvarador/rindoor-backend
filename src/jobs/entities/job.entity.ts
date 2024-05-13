@@ -1,4 +1,5 @@
 import { Category } from 'src/category/entities/category.entity';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { User } from 'src/user/entities/User.entity';
 import {
   Column,
@@ -8,7 +9,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
@@ -36,6 +36,11 @@ export class Job {
   @Column({ default: JobStatus.Active })
   status: string;
 
+  @Column({
+    type: 'varchar',
+  })
+  img: string;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -48,4 +53,7 @@ export class Job {
   @ManyToOne(() => User, (user) => user.jobs)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Postulation, (postulations) => postulations.job)
+  postulations: Postulation[];
 }

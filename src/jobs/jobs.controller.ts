@@ -7,24 +7,40 @@ import {
   Delete,
   ParseUUIDPipe,
   HttpCode,
+  Query,
+  UseInterceptors,
+  UsePipes,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+  UseGuards,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { exampleCreatedJob } from './swaggerExamples/job.swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { exampleCreatedJob, jobApiBody } from './swaggerExamples/job.swagger';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { filterJobCategory } from 'src/dto/filterJob.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { minSizeFile } from 'src/pipes/minSizeFile';
+import { modifyJob } from 'src/interceptor/modifyJob.interceptor';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/user/entities/Role.enum';
+import { GuardToken } from 'src/guards/token.guard';
+import { guardRoles } from 'src/guards/role.guard';
+import { internalServerError } from 'src/utils/swagger.utils';
 
 @Controller('jobs')
 @ApiTags('jobs')
-@ApiResponse({
-  status: 500,
-  description: 'Internal server error',
-  schema: {
-    example: {
-      statusCode: 500,
-      message: 'Internal server error',
-    },
-  },
-})
+@ApiResponse(internalServerError)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
@@ -48,9 +64,38 @@ export class JobsController {
     summary: 'Create a new Job',
     description: 'Endpoint to create a new Job',
   })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    ...jobApiBody,
+    required: false,
+  })
+  //@ApiBearerAuth()
   @Post()
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobsService.create(createJobDto);
+  // @Roles(Role.CLIENT)
+  // @UseGuards(GuardToken, guardRoles)
+  @UseInterceptors(modifyJob)
+  @UseInterceptors(FileInterceptor('file'))
+  @UsePipes(minSizeFile)
+  create(
+    @Body() createJobDto: CreateJobDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        fileIsRequired: true,
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 200000,
+            message: 'Archivo debe ser menor a 200Kb',
+          }),
+          new FileTypeValidator({
+            fileType: /(jpg)|(jpeg)|(png)|(webp)$/,
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    console.log(createJobDto);
+    return this.jobsService.create(createJobDto, file);
   }
 
   @HttpCode(200)
@@ -63,8 +108,18 @@ export class JobsController {
     description: 'Endpoint to find all Jobs',
   })
   @Get()
-  findAll() {
-    return this.jobsService.findAll();
+  // @Roles(Role.CLIENT)
+  //@UseGuards(GuardToken, guardRoles)
+  findAll(@Query() filter?: filterJobCategory) {
+    return this.jobsService.findAll(filter);
+  }
+
+  @Get('category')
+  filterByCategory(
+    @Body() category: filterJobCategory,
+    @Query() pagination?: PaginationQuery,
+  ) {
+    return this.jobsService.filterByCategory(category, pagination);
   }
 
   @HttpCode(200)
@@ -85,6 +140,18 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'Job deleted',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Job not found',
+  })
+  //  @ApiBearerAuth()
+  // @Roles(Role.CLIENT)
+  // @UseGuards(GuardToken, guardRoles)
   @Delete(':id')
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.remove(id);

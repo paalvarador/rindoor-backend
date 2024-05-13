@@ -9,6 +9,9 @@ import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { FileUpload } from 'src/cloudinary/FileUpload';
+import { filterJobCategory } from 'src/dto/filterJob.dto';
 
 @Injectable()
 export class JobsService {
@@ -17,9 +20,10 @@ export class JobsService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    private fileUploadService: FileUpload,
   ) {}
 
-  async create(createJobDto: CreateJobDto) {
+  async create(createJobDto: CreateJobDto, file) {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
@@ -32,16 +36,77 @@ export class JobsService {
     });
     if (!foundCategory) throw new NotFoundException('Category not found');
 
+    let imgUrl: string;
+    if (file) {
+      const imgUpload = await this.fileUploadService.uploadImg(file);
+      if (!imgUpload) {
+        throw new BadRequestException('Image upload failed');
+      }
+      imgUrl = imgUpload.url;
+    }
+    console.log(createJobDto);
+    console.log(file);
+
     const newJob = {
       ...createJobDto,
       category: foundCategory,
       user: foundUser,
+      img: imgUrl,
     };
+    console.log(newJob, 'created');
     return await this.jobRepository.save(newJob);
   }
 
-  async findAll() {
-    return await this.jobRepository.find();
+  async findAll(filter?: filterJobCategory) {
+    const { page, limit, categories, minPrice, maxPrice } = filter;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+    const defaultCategories = categories || [];
+    const defaultMinPrice = minPrice || 0;
+    const defaultMaxPrice = maxPrice || 999999999.99;
+
+    console.log(defaultLimit, defaultPage);
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const jobs = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    const sliceJobs = jobs.slice(startIndex, endIndex);
+    const filterJobs = sliceJobs.filter(
+      (job) =>
+        job.base_price >= defaultMinPrice &&
+        job.base_price <= defaultMaxPrice &&
+        (defaultCategories.length === 0 ||
+          defaultCategories.includes(job.category.name)),
+    );
+    return filterJobs;
+  }
+
+  async filterByCategory(category, pagination) {
+    const filterCategory = Object.values(category)[0];
+    const findJob = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    //*Paginado
+    const { page, limit } = pagination;
+    const defaultPage = page || 1;
+    const defaultLimit = limit || 5;
+
+    const startIndex = (defaultPage - 1) * defaultLimit;
+    const endIndex = startIndex + defaultLimit;
+
+    const filterJob = await findJob.filter(
+      (job) => job.category.name === filterCategory,
+    );
+
+    if (filterJob.length === 0) return { message: 'No jobs for this category' };
+
+    const sliceJobs = filterJob.slice(startIndex, endIndex);
+    return sliceJobs;
   }
 
   async findOne(id: string) {
@@ -60,7 +125,6 @@ export class JobsService {
       relations: { user: true },
     });
     if (!findJob) throw new NotFoundException('Job not found');
-    console.log(findJob.user.role);
 
     if (findJob.user.role !== 'CLIENT')
       throw new BadRequestException('Action just for Clients');

@@ -6,13 +6,17 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors({
+    origin: 'http://localhost:3000',
+  });
   const configSwagger = new DocumentBuilder()
     .setTitle('Rindoor API')
     .setDescription(
-      'Rindoor is a platform that allows you to find the best professionals to fixe your  home problems.',
+      'Rindoor is a platform that allows you to find the best professionals to fix your  home problems.',
     )
     .setVersion('1.0')
     .addTag('rindoor')
+    //.addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('api', app, document);
