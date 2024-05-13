@@ -66,10 +66,10 @@ export class ServicesService {
       where: { id },
     });
 
-    if (!service) throw new NotFoundException('service not found');
+    if (!service) throw new NotFoundException('Servicio no encontrado');
 
     if (service.name === updateServiceDto.name)
-      throw new ConflictException('Service already exists');
+      throw new ConflictException('Servicio ya existe');
 
     return await this.servicesRepository.update(id, service);
   }
@@ -79,7 +79,7 @@ export class ServicesService {
       where: { id },
     });
 
-    if (!service) throw new NotFoundException('Service not found');
+    if (!service) throw new NotFoundException('Servicio no encontrado');
 
     return await this.servicesRepository.delete(id);
   }

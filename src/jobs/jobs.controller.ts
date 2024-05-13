@@ -39,26 +39,48 @@ import { guardRoles } from 'src/guards/role.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
 
 @Controller('jobs')
-@ApiTags('jobs')
+@ApiTags('Trabajos')
 @ApiResponse(internalServerError)
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
-  @HttpCode(201)
   @ApiResponse({
     status: 201,
-    description: 'The record  has been successfully created.',
+    description: 'Trabajo creado',
     schema: {
       example: exampleCreatedJob,
     },
   })
   @ApiResponse({
     status: 404,
-    description: 'User Not Found, Category Not Found',
+    description: 'Usuario o Categoria no encontrada',
+    schema: {
+      example: [
+        {
+          message: 'Usuario no encontrado',
+        },
+        {
+          message: 'Categoria no encontrada',
+        },
+      ],
+    },
   })
   @ApiResponse({
     status: 400,
-    description: 'Action Just For Clients',
+    description: 'Error de validación',
+    schema: {
+      example: {
+        message: 'Error de validación',
+        errors: [
+          {
+            message: 'Archivo debe ser menor a 200Kb',
+          },
+          {
+            message: 'Accesso solo para los Clientes',
+          },
+        ],
+      },
+    },
   })
   @ApiOperation({
     summary: 'Create a new Job',
