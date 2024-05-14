@@ -10,6 +10,8 @@ import {
   userAlreadyExists,
   userValidationsErrors,
 } from 'src/user/swaggerExamples/User.swagger';
+import { webcrypto } from 'crypto';
+import { escape } from 'querystring';
 
 @Controller('auth')
 @ApiTags('Autenticacion')
@@ -66,8 +68,7 @@ export class AuthController {
     description: 'Registro de usuario',
   })
   @Post('signup')
-  async singup(@Body() createUserDto: CreateUserDto, @Res() res: Response) {
-    const response = await this.authService.signUp(createUserDto);
-    return response;
+  async singup(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.signUp(createUserDto);
   }
 }

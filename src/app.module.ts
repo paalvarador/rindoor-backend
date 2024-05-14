@@ -9,6 +9,8 @@ import { PostulationsModule } from './postulations/postulations.module';
 import typeOrmConfig from './config/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -16,6 +18,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       load: [typeOrmConfig],
     }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
@@ -32,6 +35,7 @@ import { AuthModule } from './auth/auth.module';
       secret: process.env.JWT_SECRET,
     }),
     AuthModule,
+    EmailModule,
   ],
 })
 export class AppModule {}
