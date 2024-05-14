@@ -13,7 +13,6 @@ export class AuthService {
   async signIn(email: string) {
     const user = await this.userService.findByEmail(email);
 
-
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
     const userPayload = {
@@ -21,6 +20,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       role: user.role,
+      subcriptionId: user.subscriptionId,
     };
 
     const token = this.jwtService.sign(userPayload);
