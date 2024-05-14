@@ -10,13 +10,13 @@ export class SubscriptionsController {
 
   @Get()
   async getSubscriptions() {
-    return this.subscriptionsService.getSubscriptions();
+    return this.subscriptionsService.getPlans();
   }
 
   @Post()
   async checkoutSubscription(@Body() subscription: CreateSubDto) {
     return this.subscriptionsService.checkoutSubscription(
-      subscription.priceId,
+      subscription.planId,
       subscription.userId,
     );
   }

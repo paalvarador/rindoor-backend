@@ -1,4 +1,4 @@
 export class CreateSubDto {
-  priceId: string;
+  planId: string;
   userId: string;
 }

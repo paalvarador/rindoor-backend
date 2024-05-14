@@ -36,7 +36,9 @@ export class UserService {
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['subscription'],
+    });
 
     const sliceUsers = users.slice(startIndex, endIndex);
     return sliceUsers;
@@ -75,5 +77,12 @@ export class UserService {
 
     await this.userRepository.delete(foundUser);
     return `Usuario eliminado`;
+  }
+
+  async chooseSubscription(subscriptionId: string, userId: string) {
+    await this.userRepository.update(
+      { id: userId },
+      { subscription: subscriptionId },
+    );
   }
 }

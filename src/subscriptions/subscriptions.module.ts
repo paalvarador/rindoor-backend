@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
+import { Subscription } from './entities/Subscription.entity';
 
 @Module({})
 export class SubscriptionsModule {
@@ -16,7 +17,7 @@ export class SubscriptionsModule {
       imports: [
         ConfigModule.forRoot(),
         UserModule,
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User, Subscription]),
       ],
       providers: [
         SubscriptionsService,
