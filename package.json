@@ -43,7 +43,8 @@
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.20",
     "uuid": "^9.0.1",
-    "stripe": "^15.6.0"
+    "stripe": "^15.6.0",
+    "pg": "8.11.5"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
