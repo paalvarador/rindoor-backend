@@ -9,6 +9,7 @@ import { PostulationsModule } from './postulations/postulations.module';
 import typeOrmConfig from './config/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
       secret: process.env.JWT_SECRET,
     }),
     AuthModule,
+    SubscriptionsModule.forRootAsync(),
   ],
 })
 export class AppModule {}

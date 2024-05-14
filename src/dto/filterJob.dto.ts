@@ -14,7 +14,7 @@ export class filterJobCategory extends PaginationQuery {
   @ApiPropertyOptional({
     type: [String],
     description: 'lista de categorias',
-    example: ['Fontaneria', 'Electricidad', 'Carpinteria'],
+    example: ['Fontaneria', 'Electricidad', 'Construccion'],
   })
   @IsString({ each: true })
   @IsOptional()

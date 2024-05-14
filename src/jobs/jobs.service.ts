@@ -64,7 +64,22 @@ export class JobsService {
     const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
-    const defaultCategories = categories || [];
+    let defaultCategories = [];
+
+    if (Array.isArray(categories)) {
+      defaultCategories = categories;
+    } else if (categories) {
+      if (typeof categories === 'string') {
+        defaultCategories = [categories];
+      } else if (categories) {
+        defaultCategories = [categories];
+      }
+    }
+
+    defaultCategories = defaultCategories.map((category) =>
+      category.trim().toLowerCase().normalize(),
+    );
+
     const defaultMinPrice = minPrice || 0;
     const defaultMaxPrice = maxPrice || 999999999.99;
 
@@ -75,17 +90,19 @@ export class JobsService {
       relations: { category: true },
     });
 
-    const sliceJobs = jobs.slice(startIndex, endIndex);
-
-    const filterJobs = sliceJobs.filter(
+    const filterJobs = jobs.filter(
       (job) =>
-        job.base_price >= defaultMinPrice &&
-        job.base_price <= defaultMaxPrice &&
-        (defaultCategories.length === 0 ||
-          defaultCategories.includes(job.category.name)),
+        job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
 
-    return filterJobs;
+    const filterCategories = filterJobs.filter((job) =>
+      defaultCategories.includes(
+        job.category.name.toLowerCase().trim().normalize(),
+      ),
+    );
+    const sliceJobs = filterCategories.slice(startIndex, endIndex);
+
+    return sliceJobs;
   }
 
   async findOne(id: string) {
