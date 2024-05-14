@@ -67,7 +67,7 @@ export class JobsService {
     const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
-    let defaultCategories = [];
+    let defaultCategories = categories || [];
 
     if (Array.isArray(categories)) {
       defaultCategories = categories;
@@ -97,12 +97,15 @@ export class JobsService {
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
+    console.log('+********JOBS*********+', filterJobs);
 
-    const filterCategories = filterJobs.filter((job) =>
-      defaultCategories.includes(
-        job.category.name.toLowerCase().trim().normalize(),
-      ),
-    );
+    const filterCategories = categories
+      ? filterJobs.filter((job) =>
+          defaultCategories.includes(
+            job.category.name.toLowerCase().trim().normalize(),
+          ),
+        )
+      : filterJobs;
     const sliceJobs = filterCategories.slice(startIndex, endIndex);
 
     return sliceJobs;
