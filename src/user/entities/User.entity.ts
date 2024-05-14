@@ -1,4 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
@@ -49,4 +57,13 @@ export class User {
 
   @OneToMany(() => Postulation, (postulations) => postulations.user)
   postulations: Postulation[];
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  planId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  customerId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  subscriptionId: string;
 }

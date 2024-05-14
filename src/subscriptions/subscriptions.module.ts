@@ -6,13 +6,14 @@ import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
+import { StripeWebHookController } from './webhook/stripeWebHook.controller';
 
 @Module({})
 export class SubscriptionsModule {
   static forRootAsync(): DynamicModule {
     return {
       module: SubscriptionsModule,
-      controllers: [SubscriptionsController],
+      controllers: [SubscriptionsController, StripeWebHookController],
       imports: [
         ConfigModule.forRoot(),
         UserModule,
