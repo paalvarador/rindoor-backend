@@ -1,9 +1,13 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  Req,
+  Request,
+  Res,
+} from '@nestjs/common';
 import Stripe from 'stripe';
 import { UserService } from 'src/user/user.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Subscription } from './entities/Subscription.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class SubscriptionsService {
@@ -12,12 +16,24 @@ export class SubscriptionsService {
   constructor(
     @Inject('STRIPE_API_KEY') private readonly apiKey: string,
     private readonly userService: UserService,
-    @InjectRepository(Subscription)
-    private subscriptionRepository: Repository<Subscription>,
   ) {
     this.stripe = new Stripe(this.apiKey, {
       apiVersion: '2024-04-10',
     });
+  }
+
+  async cancelSubscription(userId: string) {
+    const userDB = await this.userService.findOne(userId);
+
+    if (!userDB.subscriptionId) {
+      throw new NotFoundException('Usuario no tiene suscripción');
+    }
+    const subscription = await this.getSubscription(userDB.subscriptionId);
+    if (!subscription) {
+      throw new NotFoundException('Suscripción no encontrada');
+    }
+    await this.userService.setSubscription(null, null, userDB.email, null);
+    await this.stripe.subscriptions.cancel(userDB.subscriptionId);
   }
 
   async getPlans(): Promise<any[]> {
@@ -46,11 +62,19 @@ export class SubscriptionsService {
     if (!plan) {
       throw new NotFoundException('Plan no encontrado');
     }
+    let customer = user.customerId;
+    if (!user.customerId) {
+      customer = await this.stripe.customers
+        .create({
+          email: user.email,
+        })
+        .then((customer) => customer.id);
+    }
 
-    const subscription = await this.stripe.checkout.sessions.create({
+    const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
-      customer_email: user.email,
+      customer: customer,
       line_items: [
         {
           quantity: 1,
@@ -61,22 +85,14 @@ export class SubscriptionsService {
       cancel_url: 'http://localhost:3000/stripe/cancel',
     });
 
-    const planDB = await this.getSubscription(planId);
+    // this.userService.setSubscription(session.id, customer, userId, planId);
+    // Devolver la URL de la sesión de Checkout
+    const sessionUrl = { url: session.url };
 
-    this.subscriptionRepository
-      .save({
-        id: subscription.id,
-        price: planDB.price,
-        name: planDB.name,
-        currency: planDB.currency,
-        price_cents: planDB.price_cents,
-        interval: planDB.interval,
-      })
-      .then(() => {
-        this.userService.chooseSubscription(subscription.id, userId);
-      });
+    // // Verificar el estado del pago en segundo plano
+    // this.verifyPayment(session.id, customer, userId, planId);
 
-    return { url: subscription.url };
+    return sessionUrl;
   }
 
   async getPlan(planId: string) {
@@ -85,18 +101,35 @@ export class SubscriptionsService {
   }
 
   async getSubscription(subscriptionId: string) {
-    const subscriptions = await this.stripe.plans.list();
+    const subscriptions = await this.stripe.subscriptions.list();
     const subscription = subscriptions.data.find(
       (sub) => sub.id === subscriptionId,
     );
-    const tranformSubscription = {
-      price: Number.parseFloat((subscription.amount / 100).toFixed(2)),
-      name: `${subscription.amount / 100}.00 ${subscription.currency}/${subscription.interval} `,
-      currency: subscription.currency,
-      price_cents: subscription.amount,
-      interval: subscription.interval,
-      id: subscription.id,
-    };
-    return tranformSubscription;
+    return subscription;
+  }
+
+  async getUserSubscription(userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    if (!user.customerId || !user.subscriptionId || !user.planId) {
+      throw new NotFoundException('Usuario no tiene suscripción');
+    }
+    return this.stripe.subscriptions.list({ customer: user.customerId });
+  }
+
+  async verifyPayment(
+    subscriptionId: string,
+    customerId: string,
+    emailUser: string,
+    planId: string,
+  ) {
+    this.userService.setSubscription(
+      subscriptionId,
+      customerId,
+      emailUser,
+      planId,
+    );
   }
 }

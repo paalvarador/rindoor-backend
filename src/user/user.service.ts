@@ -36,9 +36,7 @@ export class UserService {
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
-    const users = await this.userRepository.find({
-      relations: ['subscription'],
-    });
+    const users = await this.userRepository.find();
 
     const sliceUsers = users.slice(startIndex, endIndex);
     return sliceUsers;
@@ -75,14 +73,46 @@ export class UserService {
     });
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.delete(foundUser);
+    await this.userRepository.delete({ id: id });
     return `Usuario eliminado`;
   }
 
-  async chooseSubscription(subscriptionId: string, userId: string) {
+  async setSubscription(
+    subscriptionId: string,
+    customerId: string,
+    emailUser: string,
+    planId: string,
+  ) {
+    const user = await this.userRepository.findOneBy({ email: emailUser });
+    console.log('***********LLEGA AQUI***********');
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
     await this.userRepository.update(
-      { id: userId },
-      { subscription: subscriptionId },
+      { email: emailUser },
+      {
+        planId,
+        customerId,
+        subscriptionId,
+      },
     );
+  }
+
+  async setSubscriptionId(
+    subscriptionId: string,
+    userEmail: string,
+    planId: string,
+    customerId: string,
+  ) {
+    const user = await this.findByEmail(userEmail);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    await this.userRepository.update(user.id, {
+      planId,
+      customerId,
+      subscriptionId,
+    });
   }
 }
