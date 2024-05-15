@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmailModule } from './email/email.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -37,7 +38,9 @@ import { ScheduleModule } from '@nestjs/schedule';
       secret: process.env.JWT_SECRET,
     }),
     AuthModule,
+
     EmailModule,
+    SubscriptionsModule.forRootAsync(),
   ],
 })
 export class AppModule {}

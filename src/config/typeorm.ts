@@ -13,11 +13,13 @@ const config = {
   password: process.env.DB_PASSWORD,
   autoLoadEntities: true,
   synchronize: true,
-  logging: true,
+  logging: ['query', 'error'],
   dropSchema: false,
   entities: ['dist/**/*.entity{.ts,.js}'],
   migrations: ['dist/migrations/*{.ts,.js}'],
   ssl: true,
+  cache: true,
+  maxQueryExecutionTime: 1000, // log queries that are slow// reduce logging in production
   extra: {
     ssl: {
       rejectUnauthorized: false,

@@ -61,4 +61,10 @@ export class User {
   @ManyToOne(() => Category, (category) => category.user)
   @JoinColumn({ name: 'category_id' })
   category: Category;
-}
+  planId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  customerId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  subscriptionId: string;

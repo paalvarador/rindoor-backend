@@ -106,7 +106,46 @@ export class UserService {
     });
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.delete(foundUser);
+    await this.userRepository.delete({ id: id });
     return `Usuario eliminado`;
+  }
+
+  async setSubscription(
+    subscriptionId: string,
+    customerId: string,
+    emailUser: string,
+    planId: string,
+  ) {
+    const user = await this.userRepository.findOneBy({ email: emailUser });
+    console.log('***********LLEGA AQUI***********');
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    await this.userRepository.update(
+      { email: emailUser },
+      {
+        planId,
+        customerId,
+        subscriptionId,
+      },
+    );
+  }
+
+  async setSubscriptionId(
+    subscriptionId: string,
+    userEmail: string,
+    planId: string,
+    customerId: string,
+  ) {
+    const user = await this.findByEmail(userEmail);
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    await this.userRepository.update(user.id, {
+      planId,
+      customerId,
+      subscriptionId,
+    });
   }
 }
