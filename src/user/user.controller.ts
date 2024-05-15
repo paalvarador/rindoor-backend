@@ -132,6 +132,14 @@ export class UserController {
     return user;
   }
 
+  @Post('category/:id')
+  async addCategory(
+    @Body() category: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.userService.addCategory(id, category);
+  }
+
   @Put('/:id')
   // @Roles(Role.CLIENT, Role.PROFESSIONAL)
   // @UseGuards(GuardToken2, guardRoles)

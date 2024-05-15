@@ -8,6 +8,7 @@ import { UserCreatedEvent } from './user.register.event';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Repository } from 'typeorm';
+import { bodyRegister } from 'src/utils/bodyRegister';
 
 @Injectable()
 export class AuthService {
@@ -58,11 +59,14 @@ export class AuthService {
       where: { id: payload.userId },
     });
 
+    const template = bodyRegister(userId.email, 'Bienvenido', userId);
+
     const mail = {
       to: userId.email,
-      subject: 'hola',
-      text: 'registro ok',
+      subject: 'Bienvenido a RinDoor',
+      text: 'Registro Exitoso',
+      template: template,
     };
-    await this.emailService.sendMail(mail);
+    await this.emailService.sendPostulation(mail);
   }
 }

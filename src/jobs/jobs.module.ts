@@ -7,10 +7,11 @@ import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { CloudinaryConfig } from 'src/config/cloudinaryConfig';
 import { FileUpload } from 'src/cloudinary/FileUpload';
+import { EmailService } from 'src/email/email.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job, User, Category])],
   controllers: [JobsController],
-  providers: [JobsService, FileUpload, CloudinaryConfig],
+  providers: [JobsService, FileUpload, CloudinaryConfig, EmailService],
 })
 export class JobsModule {}

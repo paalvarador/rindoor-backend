@@ -7,9 +7,10 @@ import { EmailService } from 'src/email/email.service';
 import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Module({
-  imports: [UserModule, EmailModule, TypeOrmModule.forFeature([User])],
+  imports: [UserModule, TypeOrmModule.forFeature([User, Category])],
   controllers: [AuthController],
   providers: [AuthService, EmailService, UserService],
 })

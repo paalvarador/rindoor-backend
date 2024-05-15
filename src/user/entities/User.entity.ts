@@ -1,9 +1,17 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
 import { Service } from 'src/services/entities/service.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -49,4 +57,8 @@ export class User {
 
   @OneToMany(() => Postulation, (postulations) => postulations.user)
   postulations: Postulation[];
+
+  @ManyToOne(() => Category, (category) => category.user)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 }

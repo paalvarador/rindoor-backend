@@ -12,9 +12,11 @@ import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
-import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileUpload } from 'src/cloudinary/FileUpload';
 import { filterJobCategory } from 'src/dto/filterJob.dto';
+import { Cron } from '@nestjs/schedule';
+import { EmailService } from 'src/email/email.service';
+import { body } from 'src/utils/body';
 
 @Injectable()
 export class JobsService {
@@ -24,6 +26,7 @@ export class JobsService {
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
     private fileUploadService: FileUpload,
+    private emailService: EmailService,
   ) {}
 
   async create(createJobDto: CreateJobDto, file) {
@@ -110,5 +113,45 @@ export class JobsService {
 
     await this.jobRepository.remove(findJob);
     return `Trabajo con id: ${id} eliminado`;
+  }
+
+  @Cron('0 0 8 * * 1-5')
+  async handleCron() {
+    const jobs = await this.jobRepository.find({
+      relations: ['user', 'category'],
+    });
+    const users = await this.userRepository.find({
+      relations: { category: true },
+    });
+    const userProfessional = users.filter(
+      (user) => user.role === 'PROFESSIONAL',
+    );
+    const categories = jobs.map((job) => job.category.name);
+
+    const proffesionalMailing = userProfessional.filter((user) =>
+      categories.includes(user.category.name),
+    );
+    proffesionalMailing.forEach((user) => {
+      const sendJob = jobs.filter(
+        (job) => job.category.name === user.category.name,
+      );
+
+      const jobsToSend = sendJob.sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateA - dateB;
+      });
+
+      const template = body(user.email, 'Trabajos Nuevos', jobsToSend);
+
+      const mail = {
+        to: user.email,
+        subject: 'Trabajos Nuevos Publicados',
+        text: 'Nuevos trabajos',
+        template: template,
+      };
+
+      this.emailService.sendPostulation(mail);
+    });
   }
 }
