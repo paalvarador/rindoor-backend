@@ -68,3 +68,4 @@ export class User {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   subscriptionId: string;
+}
