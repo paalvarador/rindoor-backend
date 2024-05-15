@@ -10,6 +10,7 @@ import typeOrmConfig from './config/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     }),
     AuthModule,
     SubscriptionsModule.forRootAsync(),
+    ChatModule,
   ],
 })
 export class AppModule {}
