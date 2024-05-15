@@ -62,6 +62,7 @@ export class User {
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
