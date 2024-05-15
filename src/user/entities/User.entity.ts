@@ -2,27 +2,25 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
-import { Service } from 'src/services/entities/service.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  firstName: string;
-
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  lastName: string;
+  @Column({ type: 'varchar', length: 200, nullable: false })
+  name: string;
 
   @Column({ type: 'varchar', length: 150, nullable: false, unique: true })
   email: string;
@@ -52,11 +50,12 @@ export class User {
   @OneToMany(() => Job, (job) => job.user)
   jobs: Job[];
 
-  @OneToMany(() => Service, (service) => service.user)
-  services: Service[];
-
   @OneToMany(() => Postulation, (postulations) => postulations.user)
   postulations: Postulation[];
+
+  @ManyToMany(() => Category)
+  @JoinTable()
+  categories: Category[];
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;

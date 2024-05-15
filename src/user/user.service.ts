@@ -10,12 +10,15 @@ import { User } from './entities/User.entity';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
+import { Category } from 'src/category/entities/category.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
   async create(createUserDto: CreateUserDto) {
     if (!createUserDto) throw new BadRequestException('Usuario es requerido');
@@ -36,7 +39,9 @@ export class UserService {
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['categories'],
+    });
 
     const sliceUsers = users.slice(startIndex, endIndex);
     return sliceUsers;
@@ -44,7 +49,7 @@ export class UserService {
 
   async findByEmail(email: string) {
     const userDB = await this.userRepository.findOne({ where: { email } });
-    if (!userDB) throw new NotFoundException('Usuario no encontrado');
+    // if (!userDB) throw new NotFoundException('Usuario no encontrado');
     return userDB;
   }
 
@@ -57,13 +62,38 @@ export class UserService {
     return findUser;
   }
 
+  async addCategory(id: string, categoryId: string) {
+    const foundUser = await this.userRepository.findOne({
+      where: { id: id },
+      relations: { categories: true },
+    });
+
+    if (!foundUser) throw new NotFoundException('Usuario no encontrado');
+
+    const categoryToAdd = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    if (!categoryToAdd) throw new NotFoundException('Category no Existe');
+
+    const idsCategories = foundUser.categories.map((category) => category.id);
+    if (!idsCategories.includes(categoryToAdd.id)) {
+      foundUser.categories.push(categoryToAdd);
+      await this.userRepository.save(foundUser);
+      return categoryToAdd;
+    }
+    return 'Usuario ya tiene esta categoria';
+  }
+
   async update(id: string, updateCategoryDto: UpdateUserDto) {
     const foundUser = await this.userRepository.findOne({
       where: { id: id },
     });
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.update(id, { ...updateCategoryDto });
+    await this.userRepository.update(id, {
+      ...updateCategoryDto,
+    });
     return `Usuario actualizado`;
   }
 

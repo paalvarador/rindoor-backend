@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { StripeWebHookController } from './webhook/stripeWebHook.controller';
+import { Category } from 'src/category/entities/category.entity';
 
 @Module({})
 export class SubscriptionsModule {
@@ -17,7 +18,7 @@ export class SubscriptionsModule {
       imports: [
         ConfigModule.forRoot(),
         UserModule,
-        TypeOrmModule.forFeature([User]),
+        TypeOrmModule.forFeature([User,Category]),
       ],
       providers: [
         SubscriptionsService,

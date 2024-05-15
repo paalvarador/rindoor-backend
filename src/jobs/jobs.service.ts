@@ -12,9 +12,11 @@ import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
-import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { FileUpload } from 'src/cloudinary/FileUpload';
 import { filterJobCategory } from 'src/dto/filterJob.dto';
+import { Cron } from '@nestjs/schedule';
+import { EmailService } from 'src/email/email.service';
+import { body } from 'src/utils/body';
 
 @Injectable()
 export class JobsService {
@@ -24,6 +26,7 @@ export class JobsService {
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
     private fileUploadService: FileUpload,
+    private emailService: EmailService,
   ) {}
 
   async create(createJobDto: CreateJobDto, file) {
@@ -64,7 +67,7 @@ export class JobsService {
     const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
-    let defaultCategories = [];
+    let defaultCategories = categories || [];
 
     if (Array.isArray(categories)) {
       defaultCategories = categories;
@@ -94,12 +97,15 @@ export class JobsService {
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
+    console.log('+********JOBS*********+', filterJobs);
 
-    const filterCategories = filterJobs.filter((job) =>
-      defaultCategories.includes(
-        job.category.name.toLowerCase().trim().normalize(),
-      ),
-    );
+    const filterCategories = categories
+      ? filterJobs.filter((job) =>
+          defaultCategories.includes(
+            job.category.name.toLowerCase().trim().normalize(),
+          ),
+        )
+      : filterJobs;
     const sliceJobs = filterCategories.slice(startIndex, endIndex);
 
     return sliceJobs;
@@ -127,5 +133,54 @@ export class JobsService {
 
     await this.jobRepository.remove(findJob);
     return `Trabajo con id: ${id} eliminado`;
+  }
+
+  @Cron('0 0 8 * * 1-5')
+  async handleCron() {
+    const jobs = await this.jobRepository.find({
+      relations: ['user', 'category'],
+    });
+    const users = await this.userRepository.find({
+      relations: { categories: true },
+    });
+    const userProfessional = users.filter(
+      (user) => user.role === 'PROFESSIONAL',
+    );
+    const categories = jobs.map((job) => job.category.name);
+
+    const userCategoriesNames = userProfessional.map((user) =>
+      user.categories.map((category) => category.name),
+    );
+
+    const flatUserCategories = userCategoriesNames
+      .flat()
+      .join(' ')
+      .toLowerCase();
+
+    const proffesionalMailing = userProfessional.filter((user) =>
+      categories.includes(flatUserCategories),
+    );
+    proffesionalMailing.forEach((user) => {
+      const sendJob = jobs.filter((job) =>
+        job.category.name.includes(flatUserCategories),
+      );
+
+      const jobsToSend = sendJob.sort((a, b) => {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return dateA - dateB;
+      });
+
+      const template = body(user.email, 'Trabajos Nuevos', jobsToSend);
+
+      const mail = {
+        to: user.email,
+        subject: 'Trabajos Nuevos Publicados',
+        text: 'Nuevos trabajos',
+        template: template,
+      };
+
+      this.emailService.sendPostulation(mail);
+    });
   }
 }

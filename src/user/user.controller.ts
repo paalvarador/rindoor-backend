@@ -37,6 +37,7 @@ import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
 import { GuardToken2 } from 'src/guards/token2.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
+import { AddCategoryUserDto } from './dto/addCategoryUser.dto';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -130,6 +131,14 @@ export class UserController {
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<User> {
     const user = await this.userService.findOne(id);
     return user;
+  }
+
+  @Post('/:id/category/:categoryId')
+  async addCategory(
+    @Param('categoryId', ParseUUIDPipe) category: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.userService.addCategory(id, category);
   }
 
   @Put('/:id')
