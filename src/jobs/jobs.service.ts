@@ -67,7 +67,7 @@ export class JobsService {
     const { page, limit, categories, minPrice, maxPrice } = filter;
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
-    let defaultCategories = [];
+    let defaultCategories = categories || [];
 
     if (Array.isArray(categories)) {
       defaultCategories = categories;
@@ -97,12 +97,15 @@ export class JobsService {
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
+    console.log('+********JOBS*********+', filterJobs);
 
-    const filterCategories = filterJobs.filter((job) =>
-      defaultCategories.includes(
-        job.category.name.toLowerCase().trim().normalize(),
-      ),
-    );
+    const filterCategories = categories
+      ? filterJobs.filter((job) =>
+          defaultCategories.includes(
+            job.category.name.toLowerCase().trim().normalize(),
+          ),
+        )
+      : filterJobs;
     const sliceJobs = filterCategories.slice(startIndex, endIndex);
 
     return sliceJobs;
@@ -138,19 +141,28 @@ export class JobsService {
       relations: ['user', 'category'],
     });
     const users = await this.userRepository.find({
-      relations: { category: true },
+      relations: { categories: true },
     });
     const userProfessional = users.filter(
       (user) => user.role === 'PROFESSIONAL',
     );
     const categories = jobs.map((job) => job.category.name);
 
+    const userCategoriesNames = userProfessional.map((user) =>
+      user.categories.map((category) => category.name),
+    );
+
+    const flatUserCategories = userCategoriesNames
+      .flat()
+      .join(' ')
+      .toLowerCase();
+
     const proffesionalMailing = userProfessional.filter((user) =>
-      categories.includes(user.category.name),
+      categories.includes(flatUserCategories),
     );
     proffesionalMailing.forEach((user) => {
-      const sendJob = jobs.filter(
-        (job) => job.category.name === user.category.name,
+      const sendJob = jobs.filter((job) =>
+        job.category.name.includes(flatUserCategories),
       );
 
       const jobsToSend = sendJob.sort((a, b) => {

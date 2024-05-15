@@ -55,7 +55,7 @@ export const bodyRegister = (to: string, subject: string, user: User) => {
     <hr style="border: 1px solid #ccc; color: #41404626; margin-top: 70px; margin-bottom: 20px;">
 
     <div class="copyright">
-   ${`<h1>${user.firstName}</h1>
+   ${`<h1>${user.name}</h1>
                 <p>${user.email}</p>
                 <p>${user.phone}</p>
                 <p>${user.role}</p>`}

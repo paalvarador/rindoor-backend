@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { CategoryModule } from './category/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ServicesModule } from './services/services.module';
 import { JobsModule } from './jobs/jobs.module';
 import { UserModule } from './user/user.module';
 import { PostulationsModule } from './postulations/postulations.module';
@@ -28,7 +27,6 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
         configService.get('typeorm'),
     }),
     CategoryModule,
-    ServicesModule,
     JobsModule,
     UserModule,
     PostulationsModule,
