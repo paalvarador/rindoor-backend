@@ -39,7 +39,9 @@ export class UserService {
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['categories'],
+    });
 
     const sliceUsers = users.slice(startIndex, endIndex);
     return sliceUsers;
@@ -60,32 +62,27 @@ export class UserService {
     return findUser;
   }
 
-  async addCategory(id: string, category: string) {
+  async addCategory(id: string, categoryId: string) {
     const foundUser = await this.userRepository.findOne({
       where: { id: id },
-      relations: { category: true },
+      relations: { categories: true },
     });
 
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
-    const categoryId = Object.values(category)[0];
-    const userCategory = await this.categoryRepository.findOne({
+    const categoryToAdd = await this.categoryRepository.findOne({
       where: { id: categoryId },
     });
 
-    if (!userCategory) throw new NotFoundException('Category no Existe');
+    if (!categoryToAdd) throw new NotFoundException('Category no Existe');
 
-    if (userCategory.id !== foundUser.category?.id) {
-      await this.userRepository.update(
-        { id: foundUser.id },
-        {
-          category: userCategory,
-        },
-      );
-      return 'Categoria agregada a usuario';
-    } else {
-      return 'Usuario ya tiene esta categoria';
+    const idsCategories = foundUser.categories.map((category) => category.id);
+    if (!idsCategories.includes(categoryToAdd.id)) {
+      foundUser.categories.push(categoryToAdd);
+      await this.userRepository.save(foundUser);
+      return categoryToAdd;
     }
+    return 'Usuario ya tiene esta categoria';
   }
 
   async update(id: string, updateCategoryDto: UpdateUserDto) {

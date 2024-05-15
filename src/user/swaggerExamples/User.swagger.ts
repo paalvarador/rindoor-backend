@@ -1,7 +1,6 @@
 export const exampleCreatedUser = {
   id: 'b96c699b-a48b-42e8-8b50-492bdafc4337',
-  firstName: 'tomas',
-  lastName: 'lopez',
+  mame: 'tomas lopez',
   email: 'lopez@gmail.com',
   phone: '4345432343',
   address: 'CL 92B #98A',

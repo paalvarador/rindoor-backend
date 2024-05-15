@@ -14,23 +14,15 @@ export enum Role {
   PROFESSIONAL = 'PROFESSIONAL',
 }
 export class CreateUserDto {
-  /**
-   * @example 'Maria'
-   * @description First name of the user
-   */
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(50)
-  firstName: string;
 
   /**
-   * @example 'Perez'
+   * @example 'Maria Perez'
    * @description Last name of the user
    */
   @IsString()
   @IsNotEmpty()
-  @MaxLength(50)
-  lastName: string;
+  @MaxLength(200)
+  name: string;
 
   /**
    * @example 'maria@gmail.com'
