@@ -42,7 +42,7 @@ export class AuthController {
     summary: 'Inicio de sesion',
     description: 'Inicio de sesion',
   })
-  async login(@Body() loginAuthDto: LoginAuthDto, @Res() res: Response) {
+  async login(@Body() loginAuthDto: LoginAuthDto) {
     const { email } = loginAuthDto;
     const response = await this.authService.signIn(email);
     return response;

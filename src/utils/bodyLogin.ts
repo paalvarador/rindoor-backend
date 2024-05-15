@@ -1,6 +1,6 @@
 import { User } from 'src/user/entities/User.entity';
 
-export const bodyRegister = (to: string, subject: string, user: User) => {
+export const bodyLogin = (to: string, subject: string, user: User) => {
   return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
   dir="ltr"
@@ -655,11 +655,10 @@ export const bodyRegister = (to: string, subject: string, user: User) => {
                                         color: #333333;
                                       "
                                     >
-                                      Registro Exitoso!
+                                      Login Exitoso!
                                     </h1>
                                     <h2>${user.firstName} ${user.lastName}</h2>
                                     <p>Email: ${user.email}</p>
-                                    <p>Tfno: ${user.phone}</p>
                                   </td>
                                 </tr>
                                 <tr>
@@ -685,9 +684,7 @@ export const bodyRegister = (to: string, subject: string, user: User) => {
                                         font-size: 16px;
                                       "
                                     >
-                                      Bienvenido a Rindoor! Ya puedes solicitar
-                                      los tecnicos que requieras para solucionar
-                                      tus problemas en casa!
+                                      Haz iniciado sesion en RinDoor
                                     </p>
                                   </td>
                                 </tr>

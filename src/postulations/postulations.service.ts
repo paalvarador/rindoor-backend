@@ -99,23 +99,22 @@ export class PostulationsService {
   @OnEvent('postulation.created')
   private async sendEmail(payload: PostulationCreatedEvent) {
     const postulationId = Object.values(payload)[0];
-    console.log(postulationId, 'payload hola');
 
     const findPostulationById = await this.postulationRepository.findOne({
       where: {
         id: postulationId,
       },
-      relations: ['user', 'job', 'job.user', 'job.category'],
+      relations: ['user', 'user.category', 'job', 'job.user', 'job.category'],
     });
 
     const userClientEmail = findPostulationById.job.user.email;
 
     const template = body2(
       userClientEmail,
-      'nuevapostulacion',
+      `Nueva postutation al trabajo ${findPostulationById.job.name}`,
       findPostulationById,
     );
-
+    console.log(findPostulationById, '**********');
     const mail = {
       to: userClientEmail,
       subject: 'Nueva postutation',

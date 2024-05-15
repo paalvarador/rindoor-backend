@@ -9,12 +9,21 @@ export const body = (to: string, subject: string, jobs: Job[]) => {
   <style>
     body {
       font-family: 'Gotham', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100%;
+      margin: auto;
     }
 
     .container {
-      width: 500px;
-      margin: 70px auto 0;
+      width: 80%;
       text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 10px;
     }
 
     h2 {
@@ -23,52 +32,77 @@ export const body = (to: string, subject: string, jobs: Job[]) => {
     }
 
     .text {
-      text-align: justify;
-      font-weight: 20px;
+      font-size: 16px;
+      text-align: center;
     }
 
     .text p {
+      text-align: center;
       margin-top: 10px;
       margin-bottom: 10px;
       color: #41404699;
-      font-size: 16px;
       font-weight: 400;
     }
 
     .copyright {
-      text-align: center;
       font-size: 0.8em;
       font-weight: 600;
+    }
+
+    .table-container {
+      margin-top: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h2>${to}</h2>
-
-    <div class="text">
-      <p>Regards! :</p>
-      <p>${subject}</p>
+    <h2>${subject}</h2>
+    <img src="https://res.cloudinary.com/do66dg8ta/image/upload/v1715804676/rbxsigdvkoauhtguvh26.png" alt="Image" style="width: 100px; height: 100px;" />
+    <p>Hey ${to}</p>
+    <div class="table-container">
+      <table>
+        <tr>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Descripción</th>
+          <th>Precio Base</th>
+        </tr>
+        ${jobs
+          .map((job, index) => {
+            if (index < 4) {
+              return `<tr>
+                        <td>${job.name}</td>
+                        <td>${job.category.name}</td>
+                        <td>${job.description}</td>
+                        <td>${job.base_price}</td>
+                      </tr>`;
+            }
+          })
+          .join('')}
+      </table>
     </div>
-
+    <div>
+      <p>Ultimos trabajos postulados</p>
+    </div>
     <hr style="border: 1px solid #ccc; color: #41404626; margin-top: 70px; margin-bottom: 20px;">
-
     <div class="copyright">
-   ${jobs.map((job, index) => {
-     if (index < 4) {
-       return `<h1>${job.name}</h1>
-                <p>${job.category.name}</p>
-                <p>${job.description}</p>
-                <p>${job.base_price}</p>`;
-     }
-   })}
-    <p>My App rights reserved.</p>
-    <p>My App rinDoor ©. All rights reserved.</p>
-      <p>My App {{ data.year }} ©. All rights reserved.</p>
+      <p>My App rinDoor ©. All rights reserved.</p>
     </div>
   </div>
 </body>
 
-</html>`;
+</html>
+`;
 };
