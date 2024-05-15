@@ -4,7 +4,6 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +11,7 @@ import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
 import { Service } from 'src/services/entities/service.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -58,7 +58,9 @@ export class User {
   @OneToMany(() => Postulation, (postulations) => postulations.user)
   postulations: Postulation[];
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @ManyToOne(() => Category, (category) => category.user)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
   planId: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
@@ -66,4 +68,3 @@ export class User {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   subscriptionId: string;
-}

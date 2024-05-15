@@ -9,6 +9,9 @@ import { PostulationsModule } from './postulations/postulations.module';
 import typeOrmConfig from './config/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
+import { EmailModule } from './email/email.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
@@ -17,6 +20,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
       isGlobal: true,
       load: [typeOrmConfig],
     }),
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) =>
@@ -33,6 +38,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
       secret: process.env.JWT_SECRET,
     }),
     AuthModule,
+
+    EmailModule,
     SubscriptionsModule.forRootAsync(),
   ],
 })
