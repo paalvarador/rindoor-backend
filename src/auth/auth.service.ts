@@ -43,11 +43,12 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
-
+    //console.log(createUserDto, '******createdto******');
     const user = await this.userService.findByEmail(email);
 
     if (user) throw new BadRequestException('Usuario ya existe');
     const newUser = await this.userService.create(createUserDto);
+    console.log(newUser, '****-*******');
     const { id } = newUser;
 
     if (!newUser) throw new BadRequestException('Registro fallido');
