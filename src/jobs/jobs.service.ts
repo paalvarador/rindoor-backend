@@ -135,7 +135,8 @@ export class JobsService {
     return `Trabajo con id: ${id} eliminado`;
   }
 
-  @Cron('0 0 8 * * 1-5')
+  //@Cron('*/20 * * * * *')
+  @Cron('0 8 * * 1-5')
   async handleCron() {
     const jobs = await this.jobRepository.find({
       relations: ['user', 'category'],
@@ -143,26 +144,26 @@ export class JobsService {
     const users = await this.userRepository.find({
       relations: { categories: true },
     });
+
     const userProfessional = users.filter(
       (user) => user.role === 'PROFESSIONAL',
     );
     const categories = jobs.map((job) => job.category.name);
 
-    const userCategoriesNames = userProfessional.map((user) =>
-      user.categories.map((category) => category.name),
+    const userCategoriesNames = [];
+    userProfessional.forEach((user) =>
+      user.categories.forEach((category) =>
+        userCategoriesNames.push(category.name),
+      ),
     );
-
-    const flatUserCategories = userCategoriesNames
-      .flat()
-      .join(' ')
-      .toLowerCase();
 
     const proffesionalMailing = userProfessional.filter((user) =>
-      categories.includes(flatUserCategories),
+      user.categories.some((category) => categories.includes(category.name)),
     );
+
     proffesionalMailing.forEach((user) => {
       const sendJob = jobs.filter((job) =>
-        job.category.name.includes(flatUserCategories),
+        userCategoriesNames.includes(job.category.name),
       );
 
       const jobsToSend = sendJob.sort((a, b) => {
