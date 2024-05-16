@@ -37,7 +37,7 @@ export class User {
   country: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
-  providence: string;
+  province: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
