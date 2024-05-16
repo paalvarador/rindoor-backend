@@ -68,7 +68,7 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  providence: string;
+  province: string;
 
   /**
    * @example 'Calle 12B # 12-12'
