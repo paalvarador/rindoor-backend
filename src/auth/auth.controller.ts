@@ -20,6 +20,7 @@ import {
 import { webcrypto } from 'crypto';
 import { escape } from 'querystring';
 import { modifyRole } from 'src/interceptor/mofifyRole.interceptor';
+import { modifyUserCreate } from 'src/interceptor/modifyUserCreate';
 
 @Controller('auth')
 @ApiTags('Autenticacion')
@@ -75,7 +76,7 @@ export class AuthController {
     summary: 'Registro de usuario',
     description: 'Registro de usuario',
   })
-  @UseInterceptors(modifyRole)
+  @UseInterceptors(modifyUserCreate, modifyRole)
   @Post('signup')
   async singup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.signUp(createUserDto);
