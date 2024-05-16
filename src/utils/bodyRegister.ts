@@ -657,9 +657,8 @@ export const bodyRegister = (to: string, subject: string, user: User) => {
                                     >
                                       Registro Exitoso!
                                     </h1>
-                                    <h2>${user.firstName} ${user.lastName}</h2>
+                                    <h2>${user.name} </h2>
                                     <p>Email: ${user.email}</p>
-                                    <p>Tfno: ${user.phone}</p>
                                   </td>
                                 </tr>
                                 <tr>
@@ -685,9 +684,7 @@ export const bodyRegister = (to: string, subject: string, user: User) => {
                                         font-size: 16px;
                                       "
                                     >
-                                      Bienvenido a Rindoor! Ya puedes solicitar
-                                      los tecnicos que requieras para solucionar
-                                      tus problemas en casa!
+                                      Registro Completado! Ya puedes comunicarte con el tecnico que prefieras para arreglas tus problemas en casa!
                                     </p>
                                   </td>
                                 </tr>

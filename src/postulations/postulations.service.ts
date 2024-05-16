@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,6 +31,7 @@ export class PostulationsService {
   async create(createPostulationDto: CreatePostulationDto) {
     const findUser = await this.userRepository.findOne({
       where: { id: createPostulationDto.userId },
+      relations: { categories: true },
     });
     if (!findUser) {
       throw new NotFoundException('Usuario no encontrado');
@@ -40,8 +42,16 @@ export class PostulationsService {
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
+      relations: { category: true },
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    if (
+      !findUser.categories.find(
+        (category) => category.name === findJob.category.name,
+      )
+    )
+      throw new UnauthorizedException('Usuario no posee esta categoria');
 
     const newPostulation = {
       ...createPostulationDto,
@@ -55,7 +65,6 @@ export class PostulationsService {
       'postulation.created',
       new PostulationCreatedEvent(postulation.id),
     );
-    console.log(postulation);
     return postulation;
   }
 
@@ -104,9 +113,9 @@ export class PostulationsService {
       where: {
         id: postulationId,
       },
-      relations: ['user', 'user.category', 'job', 'job.user', 'job.category'],
+      relations: ['user', 'user.categories', 'job', 'job.user', 'job.category'],
     });
-
+    findPostulationById.user.categories;
     const userClientEmail = findPostulationById.job.user.email;
 
     const template = body2(

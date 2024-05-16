@@ -657,7 +657,7 @@ export const bodyLogin = (to: string, subject: string, user: User) => {
                                     >
                                       Login Exitoso!
                                     </h1>
-                                    <h2>${user.firstName} ${user.lastName}</h2>
+                                    <h2>${user.name} </h2>
                                     <p>Email: ${user.email}</p>
                                   </td>
                                 </tr>

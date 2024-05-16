@@ -69,7 +69,7 @@ export const body = (to: string, subject: string, jobs: Job[]) => {
 <body>
   <div class="container">
     <h2>${subject}</h2>
-    <img src="https://res.cloudinary.com/do66dg8ta/image/upload/v1715804676/rbxsigdvkoauhtguvh26.png" alt="Image" style="width: 100px; height: 100px;" />
+    <img src=${jobs[0].category.img} alt="Image" style="width: 100px; height: 100px;" />
     <p>Hey ${to}</p>
     <div class="table-container">
       <table>

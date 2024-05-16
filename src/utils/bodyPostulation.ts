@@ -61,7 +61,7 @@ export const body2 = (
     <div>
     ${`<h1>${postulation.message}</h1>
                 <p>${postulation.created_at}</p>
-                <p> tecnico ${postulation.user.firstName}, especialidad ${postulation.user.category.name}</p>
+                <p> Tecnico ${postulation.user.name}, especialidad ${postulation.job.category.name}</p>
                  <p>${postulation.offered_price}</p>`}
     </div>
 

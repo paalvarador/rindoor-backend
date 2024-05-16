@@ -81,16 +81,11 @@ export class SubscriptionsService {
           price: planId,
         },
       ],
-      success_url: 'http://localhost:3000/stripe/success',
-      cancel_url: 'http://localhost:3000/stripe/cancel',
+      success_url: 'http://localhost:3000/works',
+      cancel_url: 'http://localhost:3000/',
     });
 
-    // this.userService.setSubscription(session.id, customer, userId, planId);
-    // Devolver la URL de la sesión de Checkout
     const sessionUrl = { url: session.url };
-
-    // // Verificar el estado del pago en segundo plano
-    // this.verifyPayment(session.id, customer, userId, planId);
 
     return sessionUrl;
   }
