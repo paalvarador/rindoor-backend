@@ -135,8 +135,8 @@ export class JobsService {
     return `Trabajo con id: ${id} eliminado`;
   }
 
-  @Cron('*/20 * * * * *')
-  //@Cron('0 8 * * 1-5')
+  //@Cron('*/20 * * * * *')
+  @Cron('0 8 * * 1-5')
   async handleCron() {
     const jobs = await this.jobRepository.find({
       relations: ['user', 'category'],
