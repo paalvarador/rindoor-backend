@@ -1,7 +1,11 @@
 import {
+  IsArray,
+  IsDefined,
   IsEmail,
   IsEnum,
+  IsInstance,
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -88,8 +92,16 @@ export class CreateUserDto {
   @IsNotEmpty()
   role: Role.CLIENT | Role.PROFESSIONAL;
 
+  /**
+   * @example ['123e4567-e89b-12d3-a456-426614174000']
+   * @description Categorias del usuario
+   */
   @IsOptional()
   @ValidateNested({ each: true })
+  @IsObject({ each: true })
+  @IsArray()
+  @IsInstance(CategoryId, { each: true })
   @Type(() => CategoryId)
+  @IsDefined({ each: true })
   categories: CategoryId[];
 }

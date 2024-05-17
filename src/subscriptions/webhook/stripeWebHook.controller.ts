@@ -12,10 +12,11 @@ export class StripeWebHookController {
       const subscriptionId = event.data.object.subscription;
       const customerId = event.data.object.customer;
       const customerEmail = event.data.object.customer_details.email;
+
       const sub: Stripe.Subscription =
-        await this.subscriptionsService.getSubscription(
+        (await this.subscriptionsService.getSubscription(
           event.data.object.subscription,
-        );
+        )) as Stripe.Subscription;
 
       const formatSub = sub as Stripe.Subscription & {
         plan: {
