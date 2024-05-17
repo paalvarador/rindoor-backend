@@ -31,7 +31,6 @@ export class StripeWebHookController {
           id: string;
         };
       };
-      console.log('***************PASA POR AQUI***************', formatSub);
       const planId = formatSub.plan.id;
       this.subscriptionsService.verifyPayment(
         subscriptionId,

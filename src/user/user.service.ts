@@ -36,7 +36,6 @@ export class UserService {
     });
     if (userDB) throw new ConflictException('Usuario ya existe');
     const userToSave = { ...createUserDto, rating: 5.0 };
-    console.log(userToSave, '*********');
     const newUser = await this.userRepository.save(userToSave);
     return newUser;
   }
@@ -58,7 +57,10 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    const userDB = await this.userRepository.findOne({ where: { email } });
+    const userDB = await this.userRepository.findOne({
+      where: { email },
+      relations: ['categories'],
+    });
     // if (!userDB) throw new NotFoundException('Usuario no encontrado');
     return userDB;
   }
@@ -124,7 +126,6 @@ export class UserService {
     planId: string,
   ) {
     const user = await this.userRepository.findOneBy({ email: emailUser });
-    console.log('***********LLEGA AQUI***********');
 
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');

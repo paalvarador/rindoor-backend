@@ -5,13 +5,16 @@ import {
   IsEnum,
   IsInstance,
   IsNotEmpty,
+  IsNumber,
   IsObject,
   IsOptional,
   IsString,
   IsUUID,
   Length,
   Matches,
+  Max,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 //import { Role } from '../entities/Role.enum';
@@ -60,40 +63,43 @@ export class CreateUserDto {
   phone: string;
 
   /**
-   * @example 'Argentina'
-   * @description Country
+   * @example 11
+   * @description Pais del usuario
    */
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  @MaxLength(50)
-  // @IsValidCountry({
-  //   message: 'Country is invalid',
-  // })
-  country: string;
+  @Min(1)
+  @Max(99999)
+  @IsValidCountry({
+    message: 'Pais invalido',
+  })
+  country: number;
 
   /**
-   * @example 'Buenos Aires'
-   * @description Provincia
+   * @example 3656
+   * @description id de la provincia del usuario
    */
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  @MaxLength(50)
-  // @IsValidProvince('country', {
-  //   message: 'Province is invalid',
-  // })
-  province: string;
+  @Min(1)
+  @Max(99999)
+  @IsValidProvince('country', {
+    message: 'Provincia invalida',
+  })
+  province: number;
 
-  // /**
-  //  * @example 'La Plata'
-  //  * @description City of the user
-  //  */
-  // @IsString()
-  // @IsNotEmpty()
-  // @MaxLength(50)
-  // @IsValidCity('country', 'province', {
-  //   message: 'City is invalid',
-  // })
-  // city: string;
+  /**
+   * @example 682
+   * @description Id de la ciudad del usuario
+   */
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(1)
+  @Max(99999)
+  @IsValidCity('country', 'province', {
+    message: 'Ciudad invalida',
+  })
+  city: number;
 
   /**
    * @example 'Calle 12B # 12-12'
