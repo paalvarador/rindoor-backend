@@ -9,6 +9,9 @@ import {
   isString,
 } from 'class-validator';
 import { Role } from '../entities/Role.enum';
+import { IsValidCity } from 'src/decorators/isValidCity';
+import { IsValidProvince } from 'src/decorators/isValidProvince';
+import { IsValidCountry } from 'src/decorators/isValidCountry';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   /**
@@ -34,6 +37,45 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @Min(1.0)
   @Max(10.0)
   rating?: number;
+
+  /**
+   * @example 11
+   * @description Pais del usuario
+   */
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(99999)
+  @IsValidCountry({
+    message: 'Pais invalido',
+  })
+  country: number;
+
+  /**
+   * @example 3656
+   * @description id de la provincia del usuario
+   */
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(99999)
+  @IsValidProvince('country', {
+    message: 'Provincia invalida',
+  })
+  province: number;
+
+  /**
+   * @example 682
+   * @description Id de la ciudad del usuario
+   */
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(99999)
+  @IsValidCity('country', 'province', {
+    message: 'Ciudad invalida',
+  })
+  city: number;
 
   @IsOptional()
   @IsString()

@@ -66,7 +66,6 @@ export class UserController {
   })
   @Post()
   async registerUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    console.log(createUserDto);
     const user = await this.userService.create(createUserDto);
     return user;
   }
@@ -190,7 +189,6 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
-    console.log(updateUserDto);
     const updatedUser = await this.userService.update(id, updateUserDto);
     return updatedUser;
   }

@@ -13,6 +13,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { ChatModule } from './chat/chat.module';
+import { UbicationModule } from './ubication/ubication.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ChatModule } from './chat/chat.module';
     EmailModule,
     SubscriptionsModule.forRootAsync(),
     ChatModule,
+    UbicationModule
   ],
 })
 export class AppModule {}
