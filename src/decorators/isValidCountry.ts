@@ -16,6 +16,7 @@ export function IsValidCountry(validationOptions?: ValidationOptions) {
         async validate(value: any, args: ValidationArguments) {
           const countries = await getAllCountries();
           const idCountries = countries.map((country) => country.id);
+
           return idCountries.includes(value);
         },
       },
