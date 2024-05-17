@@ -3,7 +3,7 @@ import {
   ValidationOptions,
   ValidationArguments,
 } from 'class-validator';
-import { State } from 'country-state-city';
+import { State, Country } from 'country-state-city';
 
 export function IsValidProvince(
   countryField: string,
@@ -17,8 +17,10 @@ export function IsValidProvince(
       options: validationOptions,
       validator: {
         validate(value: any, args: ValidationArguments) {
-          const country = (args.object as any)[countryField];
-          const provinces = State.getStatesOfCountry(country).map(
+          const country = Country.getAllCountries().find(
+            (country) => country.name === args.object[countryField],
+          );
+          const provinces = State.getStatesOfCountry(country.isoCode).map(
             (state) => state.name,
           );
           return provinces.includes(value);

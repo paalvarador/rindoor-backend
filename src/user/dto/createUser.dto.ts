@@ -18,6 +18,8 @@ import {
 import { OmitType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsValidProvince } from 'src/decorators/isValidProvince';
+import { IsValidCountry } from 'src/decorators/isValidCountry';
+import { IsValidCity } from 'src/decorators/isValidCity';
 export enum Role {
   CLIENT = 'CLIENT',
   PROFESSIONAL = 'PROFESSIONAL',
@@ -64,6 +66,9 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
+  // @IsValidCountry({
+  //   message: 'Country is invalid',
+  // })
   country: string;
 
   /**
@@ -73,8 +78,22 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
-  @IsValidProvince('country')
+  // @IsValidProvince('country', {
+  //   message: 'Province is invalid',
+  // })
   province: string;
+
+  // /**
+  //  * @example 'La Plata'
+  //  * @description City of the user
+  //  */
+  // @IsString()
+  // @IsNotEmpty()
+  // @MaxLength(50)
+  // @IsValidCity('country', 'province', {
+  //   message: 'City is invalid',
+  // })
+  // city: string;
 
   /**
    * @example 'Calle 12B # 12-12'

@@ -12,3 +12,4 @@ import { Category } from 'src/category/entities/category.entity';
   exports: [UserService],
 })
 export class UserModule {}
+
