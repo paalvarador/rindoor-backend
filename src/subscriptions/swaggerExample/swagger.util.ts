@@ -35,3 +35,14 @@ export const exampleUserOrPlanNotFound = [
     statusCode: 404,
   },
 ];
+
+export const exampleUserSubscriptions = [
+  {
+    id: 'sub_1PHHOJCB2wIFzJhtbx6GqhLl',
+    current_period_end: 1747452211,
+    current_period_start: 1715916211,
+    status: 'canceled',
+    latest_invoice: 'in_1PHHOJCB2wIFzJhtVF0xBfun',
+    customer: 'cus_Q7WQmBzTNaKZ2g',
+  },
+];

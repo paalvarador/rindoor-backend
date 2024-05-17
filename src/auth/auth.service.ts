@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Repository } from 'typeorm';
 import { bodyRegister } from 'src/utils/bodyRegister';
+import { bodyLogin } from 'src/utils/bodyLogin';
 
 @Injectable()
 export class AuthService {
@@ -35,16 +36,19 @@ export class AuthService {
 
     const token = this.jwtService.sign(userPayload);
 
+    this.eventEmitter.emit('user.login', new UserCreatedEvent(user.id));
+
     return token;
   }
 
   async signUp(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
-
+    //console.log(createUserDto, '******createdto******');
     const user = await this.userService.findByEmail(email);
 
     if (user) throw new BadRequestException('Usuario ya existe');
     const newUser = await this.userService.create(createUserDto);
+    console.log(newUser, '****-*******');
     const { id } = newUser;
 
     if (!newUser) throw new BadRequestException('Registro fallido');
@@ -60,12 +64,29 @@ export class AuthService {
       where: { id: payload.userId },
     });
 
-    const template = bodyRegister(userId.email, 'Bienvenido', userId);
+    const template = bodyRegister(userId.email, 'Bienvenido a RinDoor', userId);
 
     const mail = {
       to: userId.email,
       subject: 'Bienvenido a RinDoor',
-      text: 'Registro Exitoso',
+      text: 'Has Iniciado Sesion en RinDoor',
+      template: template,
+    };
+    await this.emailService.sendPostulation(mail);
+  }
+
+  @OnEvent('user.login')
+  private async sendEmailLogin(payload: UserCreatedEvent) {
+    const userId = await this.userRepository.findOne({
+      where: { id: payload.userId },
+    });
+
+    const template = bodyLogin(userId.email, 'Bienvenido a RinDoor', userId);
+
+    const mail = {
+      to: userId.email,
+      subject: 'Bienvenido a RinDoor',
+      text: 'Login Exitoso',
       template: template,
     };
     await this.emailService.sendPostulation(mail);

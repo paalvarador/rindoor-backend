@@ -32,7 +32,12 @@ export class SubscriptionsService {
     if (!subscription) {
       throw new NotFoundException('Suscripción no encontrada');
     }
-    await this.userService.setSubscription(null, null, userDB.email, null);
+    await this.userService.setSubscription(
+      null,
+      userDB.customerId,
+      userDB.email,
+      null,
+    );
     await this.stripe.subscriptions.cancel(userDB.subscriptionId);
   }
 
@@ -97,21 +102,45 @@ export class SubscriptionsService {
 
   async getSubscription(subscriptionId: string) {
     const subscriptions = await this.stripe.subscriptions.list();
-    const subscription = subscriptions.data.find(
-      (sub) => sub.id === subscriptionId,
-    );
-    return subscription;
+    const subscription = subscriptions.data.find((sub) => {
+      return sub.id === subscriptionId;
+    });
+    if (!subscription) {
+      throw new NotFoundException('Suscripción no encontrada');
+    }
+    const subscriptionToSend = {
+      id: subscription.id,
+      current_period_end: subscription.current_period_end,
+      current_period_start: subscription.current_period_start,
+      status: subscription.status,
+      latest_invoice: subscription.latest_invoice,
+      customer: subscription.customer,
+    };
+    return subscriptionToSend;
   }
 
-  async getUserSubscription(userId: string) {
+  async getUserSubscriptions(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
-    if (!user.customerId || !user.subscriptionId || !user.planId) {
-      throw new NotFoundException('Usuario no tiene suscripción');
-    }
-    return this.stripe.subscriptions.list({ customer: user.customerId });
+
+    const userSubscriptions = this.stripe.subscriptions.list({
+      customer: user.customerId,
+      status: 'all',
+    });
+    const userSubsMapped = (await userSubscriptions).data.map((sub) => {
+      return {
+        id: sub.id,
+        current_period_end: sub.current_period_end,
+        current_period_start: sub.current_period_start,
+        status: sub.status,
+        latest_invoice: sub.latest_invoice,
+        customer: sub.customer,
+      };
+    });
+
+    return userSubsMapped;
   }
 
   async verifyPayment(
