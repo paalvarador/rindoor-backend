@@ -53,7 +53,10 @@ export class SubscriptionsService {
         id: plan.id,
       };
     });
-    return formatSubscriptions;
+    const filteredPlans = formatSubscriptions.filter((plan) =>
+      plan.price.toString().includes('5'),
+    );
+    return filteredPlans;
   }
 
   async checkoutSubscription(planId: string, userId: string) {

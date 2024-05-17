@@ -17,6 +17,7 @@ import {
 //import { Role } from '../entities/Role.enum';
 import { OmitType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsValidProvince } from 'src/decorators/isValidProvince';
 export enum Role {
   CLIENT = 'CLIENT',
   PROFESSIONAL = 'PROFESSIONAL',
@@ -72,6 +73,7 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
+  @IsValidProvince('country')
   province: string;
 
   /**
