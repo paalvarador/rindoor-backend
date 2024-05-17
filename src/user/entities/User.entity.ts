@@ -13,6 +13,7 @@ import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -67,6 +68,12 @@ export class User {
   @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
+
+  @OneToMany(() => Chat, (chat) => chat.client)
+  clientChats: Chat[];
+
+  @OneToMany(() => Chat, (chat) => chat.professional)
+  professionalChats: Chat[];
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;
