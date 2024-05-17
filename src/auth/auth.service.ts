@@ -32,6 +32,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
       subcriptionId: user.subscriptionId,
+      categories: user.categories,
     };
 
     const token = this.jwtService.sign(userPayload);
@@ -48,7 +49,6 @@ export class AuthService {
 
     if (user) throw new BadRequestException('Usuario ya existe');
     const newUser = await this.userService.create(createUserDto);
-    console.log(newUser, '****-*******');
     const { id } = newUser;
 
     if (!newUser) throw new BadRequestException('Registro fallido');
