@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChatDto } from './dto/create-chat.dto';
-import { UpdateChatDto } from './dto/update-chat.dto';
+import { AddMessageDto } from './dto/add-message.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Chat } from './entities/chat.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
-  create(createChatDto: CreateChatDto) {
-    return 'This action adds a new chat';
+  constructor(
+    @InjectRepository(Chat) private chatRepository: Repository<Chat>,
+  ) {}
+
+  async createMessage(
+    userFrom: string,
+    userTo: string,
+    message: string,
+  ): Promise<Chat> {
+    const chatMessage = this.chatRepository.create({
+      client: { id: userFrom },
+      professional: { id: userTo },
+      message,
+    });
+
+    return await this.chatRepository.save(chatMessage);
   }
 
-  findAll() {
-    return `This action returns all chat`;
+  async getMessagesForClient(userFrom: string): Promise<Chat[]> {
+    return await this.chatRepository.find({
+      where: { client: { id: userFrom } },
+      order: { createdAt: 'ASC' },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chat`;
-  }
-
-  update(id: number, updateChatDto: UpdateChatDto) {
-    return `This action updates a #${id} chat`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} chat`;
+  async getMssageForProfessional(userTo: string): Promise<Chat[]> {
+    return await this.chatRepository.find({
+      where: { professional: { id: userTo } },
+      order: { createdAt: 'ASC' },
+    });
   }
 }
