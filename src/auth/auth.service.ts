@@ -10,6 +10,7 @@ import { User } from 'src/user/entities/User.entity';
 import { Repository } from 'typeorm';
 import { bodyRegister } from 'src/utils/bodyRegister';
 import { bodyLogin } from 'src/utils/bodyLogin';
+import { first } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -27,11 +28,20 @@ export class AuthService {
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
     const userPayload = {
-      sub: user.id,
       id: user.id,
       email: user.email,
       role: user.role,
       subcriptionId: user.subscriptionId,
+      categories: JSON.stringify(
+        user.categories.map((category) => category.id),
+      ),
+      name: user.name,
+      phone: user.phone,
+      country: user.country,
+      province: user.province,
+      city: user.city,
+      address: user.address,
+      rating: user.rating,
     };
 
     const token = this.jwtService.sign(userPayload);

@@ -1,18 +1,28 @@
 import {
+  IsArray,
+  IsDefined,
   IsEmail,
   IsEnum,
+  IsInstance,
   IsNotEmpty,
+  IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
   Length,
   Matches,
+  Max,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 //import { Role } from '../entities/Role.enum';
 import { OmitType, PickType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsValidProvince } from 'src/decorators/isValidProvince';
+import { IsValidCountry } from 'src/decorators/isValidCountry';
+import { IsValidCity } from 'src/decorators/isValidCity';
 export enum Role {
   CLIENT = 'CLIENT',
   PROFESSIONAL = 'PROFESSIONAL',
@@ -53,22 +63,43 @@ export class CreateUserDto {
   phone: string;
 
   /**
-   * @example 'Argentina'
-   * @description Country
+   * @example 11
+   * @description Pais del usuario
    */
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  @MaxLength(50)
-  country: string;
+  @Min(1)
+  @Max(99999)
+  @IsValidCountry({
+    message: 'Pais invalido',
+  })
+  country: number;
 
   /**
-   * @example 'Buenos Aires'
-   * @description Provincia
+   * @example 3656
+   * @description id de la provincia del usuario
    */
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
-  @MaxLength(50)
-  province: string;
+  @Min(1)
+  @Max(99999)
+  @IsValidProvince('country', {
+    message: 'Provincia invalida',
+  })
+  province: number;
+
+  /**
+   * @example 682
+   * @description Id de la ciudad del usuario
+   */
+  @IsNumber()
+  @IsNotEmpty()
+  @Min(1)
+  @Max(99999)
+  @IsValidCity('country', 'province', {
+    message: 'Ciudad invalida',
+  })
+  city: number;
 
   /**
    * @example 'Calle 12B # 12-12'
@@ -88,8 +119,16 @@ export class CreateUserDto {
   @IsNotEmpty()
   role: Role.CLIENT | Role.PROFESSIONAL;
 
+  /**
+   * @example ['123e4567-e89b-12d3-a456-426614174000']
+   * @description Categorias del usuario
+   */
   @IsOptional()
   @ValidateNested({ each: true })
+  @IsObject({ each: true })
+  @IsArray()
+  @IsInstance(CategoryId, { each: true })
   @Type(() => CategoryId)
+  @IsDefined({ each: true })
   categories: CategoryId[];
 }

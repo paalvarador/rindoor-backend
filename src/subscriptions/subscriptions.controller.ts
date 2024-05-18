@@ -23,6 +23,7 @@ import {
   exampleCreatedSubscription,
   examplePlans,
   exampleUserOrPlanNotFound,
+  exampleUserSubscriptions,
 } from './swaggerExample/swagger.util';
 
 @Controller('subscriptions')
@@ -104,13 +105,69 @@ export class SubscriptionsController {
     return;
   }
 
-  @Get('/plans/:id')
+  @Get('/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'Subscripción',
+    schema: {
+      example: exampleUserSubscriptions[0],
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID de la subscripción',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'uuid',
+      example: 'sub_1PHHOJCB2wIFzJhtbx6GqhLl',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Subscripción no encontrada',
+    schema: {
+      example: exampleUserOrPlanNotFound[0],
+    },
+  })
+  @ApiOperation({
+    summary: 'Obtener subscripción',
+    description: 'Obtener subscripción por ID',
+  })
   async getSubscription(@Param('id') id: string) {
     return this.subscriptionsService.getSubscription(id);
   }
 
   @Get('/user/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'Subscripciones del usuario',
+    schema: {
+      example: exampleUserSubscriptions,
+    },
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'ID del usuario',
+    required: true,
+    schema: {
+      type: 'string',
+      format: 'uuid',
+      example: 'c9bd9ea9-843a-4ed9-97de-af9d7387150e',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Usuario no encontrado',
+    schema: {
+      example: exampleUserOrPlanNotFound[0],
+    },
+  })
+  @ApiOperation({
+    summary: 'Obtener subscripciones del usuario',
+    description: 'Obtener lista de subscripciones del usuario',
+  })
   async getUserSubscription(@Param('id') id: string) {
-    return this.subscriptionsService.getUserSubscription(id);
+    return this.subscriptionsService.getUserSubscriptions(id);
   }
 }

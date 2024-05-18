@@ -22,6 +22,15 @@ export class UserService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     if (!createUserDto) throw new BadRequestException('Usuario es requerido');
+    await Promise.all(
+      createUserDto.categories.map(async (category) => {
+        const categoryDB = await this.categoryRepository.findOne({
+          where: { id: category.id },
+        });
+        if (!categoryDB) throw new NotFoundException('Categoria no existe');
+      }),
+    );
+
     const userDB = await this.userRepository.findOne({
       where: { email: createUserDto.email },
     });
@@ -48,7 +57,10 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    const userDB = await this.userRepository.findOne({ where: { email } });
+    const userDB = await this.userRepository.findOne({
+      where: { email },
+      relations: ['categories'],
+    });
     // if (!userDB) throw new NotFoundException('Usuario no encontrado');
     return userDB;
   }
@@ -114,7 +126,6 @@ export class UserService {
     planId: string,
   ) {
     const user = await this.userRepository.findOneBy({ email: emailUser });
-    console.log('***********LLEGA AQUI***********');
 
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');

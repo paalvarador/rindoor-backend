@@ -13,6 +13,7 @@ import { Role } from './Role.enum';
 import { Job } from 'src/jobs/entities/job.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Chat } from 'src/chat/entities/chat.entity';
 import { Feedback } from 'src/feedbacks/entities/feedback.entity';
 
 @Entity({ name: 'users' })
@@ -30,15 +31,17 @@ export class User {
   phone: string;
 
   @Column({
-    type: 'varchar',
-    length: 100,
+    type: 'numeric',
     nullable: false,
-    default: 'Argentina',
+    default: 11,
   })
-  country: string;
+  country: number;
 
-  @Column({ type: 'varchar', length: 100, nullable: false })
-  province: string;
+  @Column({ type: 'numeric', nullable: false, default: 3656 })
+  province: number;
+
+  @Column({ type: 'numeric', nullable: false, default: 682 })
+  city: number;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
@@ -72,6 +75,12 @@ export class User {
   @ManyToMany(() => Category)
   @JoinTable()
   categories: Category[];
+
+  @OneToMany(() => Chat, (chat) => chat.client)
+  clientChats: Chat[];
+
+  @OneToMany(() => Chat, (chat) => chat.professional)
+  professionalChats: Chat[];
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;
