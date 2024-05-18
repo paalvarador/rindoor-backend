@@ -12,6 +12,7 @@ import { EmailModule } from './email/email.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { FeedbacksModule } from './feedbacks/feedbacks.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
     EmailModule,
     SubscriptionsModule.forRootAsync(),
+    FeedbacksModule,
   ],
 })
 export class AppModule {}
