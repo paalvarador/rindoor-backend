@@ -17,7 +17,6 @@ export class EmailService {
   }
 
   async sendPostulation(datamailer) {
-    console.log(datamailer);
     await this._processSendEmail(
       datamailer.to,
       datamailer.subject,

@@ -22,14 +22,16 @@ export class UserService {
   ) {}
   async create(createUserDto: CreateUserDto) {
     if (!createUserDto) throw new BadRequestException('Usuario es requerido');
-    await Promise.all(
-      createUserDto.categories.map(async (category) => {
-        const categoryDB = await this.categoryRepository.findOne({
-          where: { id: category.id },
-        });
-        if (!categoryDB) throw new NotFoundException('Categoria no existe');
-      }),
-    );
+    if (createUserDto.categories && Array.isArray(createUserDto.categories)) {
+      await Promise.all(
+        createUserDto.categories.map(async (category) => {
+          const categoryDB = await this.categoryRepository.findOne({
+            where: { id: category.id },
+          });
+          if (!categoryDB) throw new NotFoundException('Categoria no existe');
+        }),
+      );
+    }
 
     const userDB = await this.userRepository.findOne({
       where: { email: createUserDto.email },
