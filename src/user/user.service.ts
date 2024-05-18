@@ -35,7 +35,7 @@ export class UserService {
       where: { email: createUserDto.email },
     });
     if (userDB) throw new ConflictException('Usuario ya existe');
-    const userToSave = { ...createUserDto, rating: 5.0 };
+    const userToSave = { ...createUserDto };
     const newUser = await this.userRepository.save(userToSave);
     return newUser;
   }

@@ -1,4 +1,5 @@
 import { Category } from 'src/category/entities/category.entity';
+import { Feedback } from 'src/feedbacks/entities/feedback.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { User } from 'src/user/entities/User.entity';
 import {
@@ -62,6 +63,9 @@ export class Job {
   @ManyToOne(() => User, (user) => user.jobs)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @OneToMany(() => Feedback, (feeback) => feeback.job)
+  feedback: Feedback[]
 
   @OneToMany(() => Postulation, (postulations) => postulations.job)
   postulations: Postulation[];

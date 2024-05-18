@@ -14,6 +14,7 @@ import { Job } from 'src/jobs/entities/job.entity';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Chat } from 'src/chat/entities/chat.entity';
+import { Feedback } from 'src/feedbacks/entities/feedback.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -46,11 +47,15 @@ export class User {
   address: string;
 
   @Column({
-    type: 'varchar',
-    length: 100,
-    nullable: false,
-    precision: 2,
+    type: 'decimal',
+    precision: 10,
     scale: 2,
+    nullable: false,
+    default: 5.0,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
   })
   rating: number;
 
@@ -85,4 +90,10 @@ export class User {
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   subscriptionId: string;
+
+  @ManyToMany(() => Feedback, (feedback) => feedback.author)
+  sentFeedbacks: Feedback[];
+
+  @ManyToMany(() => Feedback, (feedback) => feedback.recipient)
+  receivedFeedbacks: Feedback[];
 }

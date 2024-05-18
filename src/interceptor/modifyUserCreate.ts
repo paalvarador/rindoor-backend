@@ -19,8 +19,6 @@ export class modifyUserCreate implements NestInterceptor {
         id: c,
       }));
     }
-
-    console.log(typeof request.body.categories);
     return next.handle();
   }
 }
