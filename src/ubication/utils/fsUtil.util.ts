@@ -12,6 +12,27 @@ export const getAllCountries = async () => {
   });
 };
 
+export const findCountryName = async (idCountry: number) => {
+  const countries: any[] = await JSON.parse(
+    fs.readFileSync('src/ubication/data/countries.json', 'utf-8'),
+  );
+  return await countries.find((country) => country.id == idCountry);
+};
+
+export const findState = async (id: number) => {
+  const states: any[] = await JSON.parse(
+    fs.readFileSync('src/ubication/data/states.json', 'utf-8'),
+  );
+  return await states.find((state) => state.id == id);
+};
+
+export const findCity = async (id: number) => {
+  const cities: any[] = await JSON.parse(
+    fs.readFileSync('src/ubication/data/cities.json', 'utf-8'),
+  );
+  return await cities.find((city) => city.id == id);
+};
+
 export const getStatesCountry = async (id: number) => {
   const states: any[] = await JSON.parse(
     fs.readFileSync('src/ubication/data/states.json', 'utf-8'),
@@ -47,7 +68,7 @@ export const showUbication = async (id_country: number, id_state: number) => {
   };
 };
 
-async function findCitiesByStateId(id: number) {
+export async function findCitiesByStateId(id: number) {
   const cities: any[] = await JSON.parse(
     fs.readFileSync('src/ubication/data/cities.json', 'utf-8'),
   );

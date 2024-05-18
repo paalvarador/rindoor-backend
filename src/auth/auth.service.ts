@@ -11,6 +11,11 @@ import { Repository } from 'typeorm';
 import { bodyRegister } from 'src/utils/bodyRegister';
 import { bodyLogin } from 'src/utils/bodyLogin';
 import { first } from 'rxjs';
+import {
+  findCity,
+  findCountryName,
+  findState,
+} from 'src/ubication/utils/fsUtil.util';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +32,10 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
+    const userCountryName = await findCountryName(user.country);
+    const userState = await findState(user.province);
+    const userCity = await findCity(user.city);
+
     const userPayload = {
       id: user.id,
       email: user.email,
@@ -37,9 +46,9 @@ export class AuthService {
       ),
       name: user.name,
       phone: user.phone,
-      country: user.country,
-      province: user.province,
-      city: user.city,
+      country: userCountryName.name,
+      province: userState.name,
+      city: userCity.name,
       address: user.address,
       rating: user.rating,
     };
