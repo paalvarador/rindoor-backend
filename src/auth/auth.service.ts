@@ -27,12 +27,15 @@ export class AuthService {
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
     const userPayload = {
-      sub: user.id,
       id: user.id,
       email: user.email,
       role: user.role,
       subcriptionId: user.subscriptionId,
-      categories: user.categories,
+      categories: JSON.stringify(
+        user.categories.map((category) => category.id),
+      ),
+      country: user.country,
+      province: user.province,
     };
 
     const token = this.jwtService.sign(userPayload);
