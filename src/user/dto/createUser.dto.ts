@@ -62,44 +62,29 @@ export class CreateUserDto {
   @Matches(/^[0-9]{10}$/, { message: 'Phone number must be 10 digits' })
   phone: string;
 
-  /**
-   * @example 11
-   * @description Pais del usuario
+ /**
+   * @example 'Argentina'
+   * @description Country
    */
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidCountry({
-    message: 'Pais invalido',
-  })
-  country: number;
+  @MaxLength(50)
+  // @IsValidCountry({
+  //   message: 'Country is invalid',
+  // })
+  country: string;
 
   /**
-   * @example 3656
-   * @description id de la provincia del usuario
+   * @example 'Buenos Aires'
+   * @description Provincia
    */
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidProvince('country', {
-    message: 'Provincia invalida',
-  })
-  province: number;
-
-  /**
-   * @example 682
-   * @description Id de la ciudad del usuario
-   */
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidCity('country', 'province', {
-    message: 'Ciudad invalida',
-  })
-  city: number;
+  @MaxLength(50)
+  // @IsValidProvince('country', {
+  //   message: 'Province is invalid',
+  // })
+  province: string;
 
   /**
    * @example 'Calle 12B # 12-12'
