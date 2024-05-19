@@ -48,7 +48,6 @@ export class AuthService {
       phone: user.phone,
       country: user.country,
       province: user.province,
-      //city: userCity.name,
       address: user.address,
       rating: user.rating,
     };
