@@ -56,7 +56,6 @@ export class CategoryService {
     const defaultPage = page || 1;
     const defaultLimit = limit || 50;
 
-    console.log(defaultLimit, defaultPage);
 
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;

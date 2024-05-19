@@ -10,6 +10,12 @@ import { User } from 'src/user/entities/User.entity';
 import { Repository } from 'typeorm';
 import { bodyRegister } from 'src/utils/bodyRegister';
 import { bodyLogin } from 'src/utils/bodyLogin';
+import { first } from 'rxjs';
+import {
+  findCity,
+  findCountryName,
+  findState,
+} from 'src/ubication/utils/fsUtil.util';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +32,10 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
+    const userCountryName = await findCountryName(user.country);
+    const userState = await findState(user.province);
+    const userCity = await findCity(user.city);
+
     const userPayload = {
       id: user.id,
       email: user.email,
@@ -34,8 +44,12 @@ export class AuthService {
       categories: JSON.stringify(
         user.categories.map((category) => category.id),
       ),
-      country: user.country,
-      province: user.province,
+      name: user.name,
+      phone: user.phone,
+      country: userCountryName.name,
+      province: userState.name,
+      address: user.address,
+      rating: user.rating,
     };
 
     const token = this.jwtService.sign(userPayload);
@@ -47,7 +61,6 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
-    //console.log(createUserDto, '******createdto******');
     const user = await this.userService.findByEmail(email);
 
     if (user) throw new BadRequestException('Usuario ya existe');

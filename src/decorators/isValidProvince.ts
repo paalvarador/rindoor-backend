@@ -4,6 +4,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import { State, Country } from 'country-state-city';
+import { getStatesCountry } from 'src/ubication/utils/fsUtil.util';
 
 export function IsValidProvince(
   countryField: string,
@@ -16,14 +17,12 @@ export function IsValidProvince(
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const country = Country.getAllCountries().find(
-            (country) => country.name === args.object[countryField],
+        async validate(value: any, args: ValidationArguments) {
+          const country = args.object[countryField];
+          const provincesIds = (await getStatesCountry(country)).map(
+            (state) => state.id,
           );
-          const provinces = State.getStatesOfCountry(country.isoCode).map(
-            (state) => state.name,
-          );
-          return provinces.includes(value);
+          return provincesIds.includes(value);
         },
       },
     });

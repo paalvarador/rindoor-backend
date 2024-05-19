@@ -3,7 +3,7 @@ import {
   registerDecorator,
   ValidationArguments,
 } from 'class-validator';
-import { Country } from 'country-state-city';
+import { getAllCountries } from 'src/ubication/utils/fsUtil.util';
 
 export function IsValidCountry(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
@@ -13,11 +13,11 @@ export function IsValidCountry(validationOptions?: ValidationOptions) {
       propertyName: propertyName,
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const countries = Country.getAllCountries().map(
-            (country) => country.name,
-          );
-          return countries.includes(value);
+        async validate(value: any, args: ValidationArguments) {
+          const countries = await getAllCountries();
+          const idCountries = countries.map((country) => country.id);
+
+          return idCountries.includes(value);
         },
       },
     });

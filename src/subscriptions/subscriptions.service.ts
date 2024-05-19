@@ -113,8 +113,12 @@ export class SubscriptionsService {
     }
     const subscriptionToSend = {
       id: subscription.id,
-      current_period_end: subscription.current_period_end,
-      current_period_start: subscription.current_period_start,
+      current_period_end: new Date(subscription.current_period_end * 1000)
+        .toISOString()
+        .split('T')[0],
+      current_period_start: new Date(subscription.current_period_start * 1000)
+        .toISOString()
+        .split('T')[0],
       status: subscription.status,
       latest_invoice: subscription.latest_invoice,
       customer: subscription.customer,
@@ -135,8 +139,12 @@ export class SubscriptionsService {
     const userSubsMapped = (await userSubscriptions).data.map((sub) => {
       return {
         id: sub.id,
-        current_period_end: sub.current_period_end,
-        current_period_start: sub.current_period_start,
+        current_period_end: new Date(sub.current_period_end * 1000)
+          .toISOString()
+          .split('T')[0],
+        current_period_start: new Date(sub.current_period_start * 1000)
+          .toISOString()
+          .split('T')[0],
         status: sub.status,
         latest_invoice: sub.latest_invoice,
         customer: sub.customer,
