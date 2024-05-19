@@ -32,9 +32,9 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
 
-    const userCountryName = await findCountryName(user.country);
-    const userState = await findState(user.province);
-    const userCity = await findCity(user.city);
+    // const userCountryName = await findCountryName(user.country);
+    // const userState = await findState(user.province);
+    // const userCity = await findCity(user.city);
 
     const userPayload = {
       id: user.id,
@@ -46,9 +46,9 @@ export class AuthService {
       ),
       name: user.name,
       phone: user.phone,
-      country: userCountryName.name,
-      province: userState.name,
-      city: userCity.name,
+      country: user.country,
+      province: user.province,
+      //city: userCity.name,
       address: user.address,
       rating: user.rating,
     };

@@ -31,17 +31,18 @@ export class User {
   phone: string;
 
   @Column({
-    type: 'numeric',
+    type: 'varchar',
     nullable: false,
-    default: 11,
   })
-  country: number;
+  country: string;
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  province: string;
 
-  @Column({ type: 'numeric', nullable: false, default: 3656 })
-  province: number;
-
-  @Column({ type: 'numeric', nullable: false, default: 682 })
-  city: number;
+  // @Column({ type: 'numeric', nullable: false, default: 682 })
+  // city: number;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
