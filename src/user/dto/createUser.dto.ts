@@ -63,43 +63,33 @@ export class CreateUserDto {
   phone: string;
 
   /**
-   * @example 11
+   * @example Argentina
    * @description Pais del usuario
    */
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidCountry({
-    message: 'Pais invalido',
-  })
-  country: number;
+  country: string;
 
   /**
-   * @example 3656
-   * @description id de la provincia del usuario
+   * @example Buenos Aires
+   * @description nombre de la provincia del usuario
    */
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidProvince('country', {
-    message: 'Provincia invalida',
-  })
-  province: number;
+  province: string;
 
-  /**
-   * @example 682
-   * @description Id de la ciudad del usuario
-   */
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(1)
-  @Max(99999)
-  @IsValidCity('country', 'province', {
-    message: 'Ciudad invalida',
-  })
-  city: number;
+  // /**
+  //  * @example 682
+  //  * @description Id de la ciudad del usuario
+  //  */
+  // @IsNumber()
+  // @IsNotEmpty()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidCity('country', 'province', {
+  //   message: 'Ciudad invalida',
+  // })
+  // city: string;
 
   /**
    * @example 'Calle 12B # 12-12'

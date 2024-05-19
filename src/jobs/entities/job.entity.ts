@@ -18,6 +18,7 @@ enum JobStatus {
   Active = 'active',
   Pending = 'pending',
   Cancelled = 'cancelled',
+  Finished = 'finished',
 }
 
 @Entity({ name: 'jobs' })
@@ -65,7 +66,7 @@ export class Job {
   user: User;
 
   @OneToMany(() => Feedback, (feeback) => feeback.job)
-  feedback: Feedback[]
+  feedback: Feedback[];
 
   @OneToMany(() => Postulation, (postulations) => postulations.job)
   postulations: Postulation[];

@@ -36,8 +36,7 @@ export class FeedbacksService {
     const existReceptor = finJob.feedback.some((f) =>
       f.recipient.some((r) => r.id === receptorId),
     );
-    if (existReceptor)
-      throw new ConflictException('usuario, no puede comentar dos veces');
+    if (existReceptor) throw new ConflictException('receptor, solo puede recibir un comentario');
 
     const existsAuthor = finJob.feedback.some((f) =>
       f.author.some((a) => a.id === createFeedbackDto.authorId),
