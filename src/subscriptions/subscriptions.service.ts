@@ -89,8 +89,8 @@ export class SubscriptionsService {
           price: planId,
         },
       ],
-      success_url: 'http://localhost:3000/works',
-      cancel_url: 'http://localhost:3000/',
+      success_url: 'https://rindoor-2-0.vercel.app/subscription',
+      cancel_url: 'https://rindoor-2-0.vercel.app/subscription',
     });
 
     const sessionUrl = { url: session.url };
