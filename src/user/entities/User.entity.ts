@@ -21,6 +21,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
 
+  @Column({ type: 'boolean', default: false })
+  banned: boolean;
+
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;
 
@@ -62,7 +65,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: Role,
+    enum: [Role.CLIENT, Role.PROFESSIONAL],
     nullable: false,
   })
   role: Role;

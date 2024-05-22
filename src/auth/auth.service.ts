@@ -64,6 +64,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (user) throw new BadRequestException('Usuario ya existe');
+
     const newUser = await this.userService.create(createUserDto);
     const { id } = newUser;
 
