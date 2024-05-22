@@ -6,15 +6,16 @@ import {
 } from '@nestjs/common';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Postulation } from './entities/postulation.entity';
+import { Postulation, PostulationStatus } from './entities/postulation.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
-import { Job } from 'src/jobs/entities/job.entity';
+import { Job, JobStatus } from 'src/jobs/entities/job.entity';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { EmailService } from 'src/email/email.service';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PostulationCreatedEvent } from './PostulationCreatedEvent';
 import { body2 } from 'src/utils/bodyPostulation';
+import { ClosePostulation } from './dto/closePostulation.dto';
 
 @Injectable()
 export class PostulationsService {
@@ -76,9 +77,42 @@ export class PostulationsService {
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
-    const postulations = await this.postulationRepository.find();
+    const postulations = await this.postulationRepository.find({
+      relations: ['user', 'job', 'job.user'],
+    });
     const slicePostulations = postulations.slice(startIndex, endIndex);
     return slicePostulations;
+  }
+
+  //*CLIENT
+  async cancelPostulationByClient(closePostulation: ClosePostulation) {
+    const findUser = await this.userRepository.findOne({
+      where: { id: closePostulation.userId },
+      relations: ['jobs', 'jobs.postulations'],
+    });
+    if (!findUser) throw new NotFoundException('User not found');
+
+    const samePostulation = findUser.jobs.find((job) =>
+      job.postulations.some(
+        (postulation) => postulation.id === closePostulation.postulationId,
+      ),
+    );
+    if (!samePostulation)
+      throw new NotFoundException(
+        "Postulation is not relationated with any user's job",
+      );
+
+    await this.postulationRepository.update(
+      { id: closePostulation.postulationId },
+      { status: PostulationStatus.CLOSED },
+    );
+
+    await this.jobRepository.update(
+      { id: samePostulation.id },
+      { status: JobStatus.Pending },
+    );
+
+    return 'Postulation closed by user';
   }
 
   async findOne(id: string) {

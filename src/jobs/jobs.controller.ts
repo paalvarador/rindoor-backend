@@ -15,6 +15,7 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
@@ -46,6 +47,7 @@ import { GuardToken } from 'src/guards/token.guard';
 import { guardRoles } from 'src/guards/role.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
 import { error } from 'console';
+import { FinishJob } from './dto/finishJob.dto';
 
 @Controller('jobs')
 @ApiTags('Trabajos')
@@ -170,6 +172,11 @@ export class JobsController {
   @Get(':id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.jobsService.findOne(id);
+  }
+
+  @Put('finish')
+  finishJob(@Body() finishJob: FinishJob) {
+    return this.jobsService.finishJob(finishJob);
   }
 
   @HttpCode(204)
