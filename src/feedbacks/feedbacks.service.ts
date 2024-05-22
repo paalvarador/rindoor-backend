@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -33,10 +34,14 @@ export class FeedbacksService {
       ],
     });
 
+    if (finJob.status !== 'finished')
+      throw new BadRequestException('Just can qualify if the Job is FINISHED');
+
     const existReceptor = finJob.feedback.some((f) =>
       f.recipient.some((r) => r.id === receptorId),
     );
-    if (existReceptor) throw new ConflictException('receptor, solo puede recibir un comentario');
+    if (existReceptor)
+      throw new ConflictException('receptor, solo puede recibir un comentario');
 
     const existsAuthor = finJob.feedback.some((f) =>
       f.author.some((a) => a.id === createFeedbackDto.authorId),

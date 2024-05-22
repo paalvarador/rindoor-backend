@@ -23,6 +23,10 @@ export class CreateJobDto {
   base_price: number;
 
   @IsNotEmpty()
+  @IsString()
+  coords: string;
+
+  @IsNotEmpty()
   @IsUUID()
   categoryId: string;
 

@@ -103,6 +103,39 @@ export class SubscriptionsService {
     return plan;
   }
 
+  async getAllSubscriptions() {
+    const findSubscriptions = await this.stripe.subscriptions.list();
+
+    const subscriptions = await Promise.all(
+      findSubscriptions.data.map(async (s) => {
+        const customer = await this.stripe.customers.retrieve(
+          s.customer as string,
+        );
+
+        const planItems = s.items.data.map((item) => ({
+          id: item.plan.id,
+          interval: item.plan.interval,
+          currency: item.plan.currency,
+          price: item.plan.interval === 'month' ? '5' : '50',
+        }));
+        return {
+          id: s.id,
+          createdAt: new Date(s.created * 1000),
+          current_period_end: new Date(s.current_period_end * 1000),
+          current_period_start: new Date(s.current_period_start * 1000),
+          status: s.status,
+          customer: {
+            id: customer.id,
+            email: (customer as Stripe.Customer).email,
+          },
+          plan: planItems,
+        };
+      }),
+    );
+
+    return subscriptions;
+  }
+
   async getSubscription(subscriptionId: string) {
     const subscriptions = await this.stripe.subscriptions.list();
     const subscription = subscriptions.data.find((sub) => {

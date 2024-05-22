@@ -10,9 +10,9 @@ import {
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-enum PostulationStatus {
-  Active = 'active',
-  Pending = 'pending',
+export enum PostulationStatus {
+  OPEN = 'open',
+  CLOSED = 'closed',
   Cancelled = 'cancelled',
 }
 
@@ -27,7 +27,7 @@ export class Postulation {
   @Column({ type: 'text' })
   message: string;
 
-  @Column({ default: PostulationStatus.Active })
+  @Column({ default: PostulationStatus.OPEN })
   status: string;
 
   @CreateDateColumn()

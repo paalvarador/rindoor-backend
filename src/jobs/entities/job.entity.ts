@@ -14,7 +14,7 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-enum JobStatus {
+export enum JobStatus {
   Active = 'active',
   Pending = 'pending',
   Cancelled = 'cancelled',
@@ -46,6 +46,11 @@ export class Job {
 
   @Column({ default: JobStatus.Active })
   status: string;
+
+  @Column({
+    type: 'varchar',
+  })
+  coords: string;
 
   @Column({
     type: 'varchar',

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from 'src/user/dto/createUser.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -7,7 +11,7 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { UserCreatedEvent } from './user.register.event';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
-import { Repository } from 'typeorm';
+import { NoConnectionForRepositoryError, Repository } from 'typeorm';
 import { bodyRegister } from 'src/utils/bodyRegister';
 import { bodyLogin } from 'src/utils/bodyLogin';
 import { first } from 'rxjs';
@@ -31,7 +35,8 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
-
+    if (user.banned === true)
+      throw new UnauthorizedException('Usuario Baneado');
     // const userCountryName = await findCountryName(user.country);
     // const userState = await findState(user.province);
     // const userCity = await findCity(user.city);
@@ -64,6 +69,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (user) throw new BadRequestException('Usuario ya existe');
+
     const newUser = await this.userService.create(createUserDto);
     const { id } = newUser;
 

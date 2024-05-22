@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import { PostulationsService } from './postulations.service';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
@@ -33,6 +34,7 @@ import { guardRoles } from 'src/guards/role.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
 import e from 'express';
 import { error } from 'console';
+import { ClosePostulation } from './dto/closePostulation.dto';
 
 @Controller('postulations')
 @ApiTags('Postulaciones')
@@ -140,5 +142,10 @@ export class PostulationsController {
   // @UseGuards(GuardToken, guardRoles)
   remove(@Param('id') id: string) {
     return this.postulationsService.remove(id);
+  }
+
+  @Put('cancel')
+  cancelPostulationByClient(@Body() closePostulation: ClosePostulation) {
+    return this.postulationsService.cancelPostulationByClient(closePostulation);
   }
 }

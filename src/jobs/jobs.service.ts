@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Job } from './entities/job.entity';
+import { Job, JobStatus } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
@@ -17,6 +17,7 @@ import { filterJobCategory } from 'src/dto/filterJob.dto';
 import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { body } from 'src/utils/body';
+import { FinishJob } from './dto/finishJob.dto';
 
 @Injectable()
 export class JobsService {
@@ -36,6 +37,8 @@ export class JobsService {
     if (!foundUser) throw new NotFoundException('Usuario not found');
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
+    if (foundUser.banned === true)
+      throw new UnauthorizedException('Usuario Baneado');
 
     const foundCategory = await this.categoryRepository.findOne({
       where: { id: createJobDto.categoryId },
@@ -106,7 +109,7 @@ export class JobsService {
         )
       : filterJobs;
     const sliceJobs = filterCategories.slice(startIndex, endIndex);
-return sliceJobs
+    return sliceJobs;
     // const countryJobs = !filter.country
     //   ? sliceJobs
     //   : sliceJobs.filter((job) => job.user.country === filter.country);
@@ -160,10 +163,52 @@ return sliceJobs
     // return sortedJobsByPrice;
   }
 
+  async findJobByClient(clientId: string) {
+    const findJob = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    const filterByUser = findJob.filter((job) => job.user.id === clientId);
+    if (!filterByUser)
+      throw new NotFoundException('User does not have any jobs associated');
+
+    return filterByUser;
+  }
+
+  //*Professional
+  async finishJob(finishJob: FinishJob) {
+    const findJob = await this.jobRepository.findOne({
+      where: { id: finishJob.jobId },
+      relations: ['postulations', 'postulations.user'],
+    });
+    if (!findJob) throw new NotFoundException('Job does not exist');
+
+    const findFinishJob = findJob.postulations.find(
+      (p) => p.user.id === finishJob.userId,
+    );
+    if (!findFinishJob)
+      throw new NotFoundException(
+        'Job does not have relationship with userProfessional',
+      );
+
+    await this.jobRepository.update(
+      { id: findJob.id },
+      { status: JobStatus.Finished },
+    );
+
+    return 'Job finished successfully by professional';
+  }
+
   async findOne(id: string) {
     const findJob = await this.jobRepository.findOne({
       where: { id: id },
-      relations: { user: true },
+      relations: [
+        'category',
+        'user',
+        'postulations',
+        'postulations.user',
+        'postulations.user.categories',
+      ],
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
