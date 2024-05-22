@@ -12,7 +12,7 @@ import { AddMessageDto } from './dto/add-message.dto';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
-@WebSocketGateway({ cors: { origin: 'http://localhost:3000' } })
+@WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly chatService: ChatService) {}
 
@@ -44,16 +44,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       payload.userTo,
       payload.message,
     );
-
-    // Emit to the sender
     this.server.emit(
       `message_${payload.userFrom}_${payload.userTo}`,
-      newMessage,
-    );
-
-    // Emit to the receiver
-    this.server.emit(
-      `message_${payload.userTo}_${payload.userFrom}`,
       newMessage,
     );
   }
