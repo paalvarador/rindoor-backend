@@ -3,7 +3,7 @@ import {
   ValidationOptions,
   ValidationArguments,
 } from 'class-validator';
-import { State, Country } from 'country-state-city';
+// import { State, Country } from 'country-state-city';
 import { getStatesCountry } from 'src/ubication/utils/fsUtil.util';
 
 export function IsValidProvince(
