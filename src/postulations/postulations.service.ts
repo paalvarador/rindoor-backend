@@ -40,6 +40,8 @@ export class PostulationsService {
 
     if (findUser.role !== 'PROFESSIONAL')
       throw new BadRequestException('Acesso solo para los Profesionales');
+    if (findUser.banned === true)
+      throw new UnauthorizedException('Usuario Baneado');
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
