@@ -163,7 +163,7 @@ export class JobsService {
 
   async findJobByClient(clientId: string) {
     const findJob = await this.jobRepository.find({
-      relations: { user: true },
+      relations: { category: true },
     });
 
     const filterByUser = findJob.filter((job) => job.user.id === clientId);
@@ -200,7 +200,13 @@ export class JobsService {
   async findOne(id: string) {
     const findJob = await this.jobRepository.findOne({
       where: { id: id },
-      relations: { user: true },
+      relations: [
+        'category',
+        'user',
+        'postulations',
+        'postulations.user',
+        'postulations.user.categories',
+      ],
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 

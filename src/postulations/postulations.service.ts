@@ -118,6 +118,7 @@ export class PostulationsService {
   async findOne(id: string) {
     const findPostulation = await this.postulationRepository.findOne({
       where: { id: id },
+      relations: ['user', 'job', 'job.user'],
     });
     if (!findPostulation) throw new NotFoundException('Postulation not found');
 

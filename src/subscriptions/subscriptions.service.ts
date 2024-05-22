@@ -103,6 +103,15 @@ export class SubscriptionsService {
     return plan;
   }
 
+  async getAllSubscriptions() {
+    const prueba = 'cus_Q9EkDRp4lQBxpK';
+    const hola = await this.stripe.customers.retrieve(prueba);
+
+    console.log(hola);
+
+    return (await this.stripe.subscriptions.list()).data;
+  }
+
   async getSubscription(subscriptionId: string) {
     const subscriptions = await this.stripe.subscriptions.list();
     const subscription = subscriptions.data.find((sub) => {
