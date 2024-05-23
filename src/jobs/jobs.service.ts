@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { CreateJobDto } from './dto/create-job.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Job } from './entities/job.entity';
+import { Job, JobStatus } from './entities/job.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
@@ -17,6 +17,7 @@ import { filterJobCategory } from 'src/dto/filterJob.dto';
 import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { body } from 'src/utils/body';
+import { FinishJob } from './dto/finishJob.dto';
 
 @Injectable()
 export class JobsService {
@@ -36,6 +37,8 @@ export class JobsService {
     if (!foundUser) throw new NotFoundException('Usuario not found');
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
+    if (foundUser.isActive === false)
+      throw new UnauthorizedException('Usuario Baneado');
 
     const foundCategory = await this.categoryRepository.findOne({
       where: { id: createJobDto.categoryId },
@@ -106,64 +109,106 @@ export class JobsService {
         )
       : filterJobs;
     const sliceJobs = filterCategories.slice(startIndex, endIndex);
+    return sliceJobs;
+    // const countryJobs = !filter.country
+    //   ? sliceJobs
+    //   : sliceJobs.filter((job) => job.user.country === filter.country);
 
-    const countryJobs = !filter.country
-      ? sliceJobs
-      : sliceJobs.filter((job) => job.user.country === filter.country);
+    // const stateJobs = !filter.province
+    //   ? countryJobs
+    //   : countryJobs.filter((job) => job.user.province === filter.province);
+    // const cityJobs = !filter.city
+    //   ? stateJobs
+    //   : stateJobs.filter((job) => job.user.city === filter.city);
 
-    const stateJobs = !filter.province
-      ? countryJobs
-      : countryJobs.filter((job) => job.user.province === filter.province);
-    const cityJobs = !filter.city
-      ? stateJobs
-      : stateJobs.filter((job) => job.user.city === filter.city);
+    // filter.name = filter.name && Number.parseInt(filter.name.toString());
+    // const sortedJobsByName =
+    //   filter.province === undefined
+    //     ? cityJobs
+    //     : filter.name === 0
+    //       ? cityJobs.sort((a, b) => {
+    //           const nameA = a.name.toUpperCase();
+    //           const nameB = b.name.toUpperCase();
+    //           return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
+    //         })
+    //       : cityJobs.sort((a, b) => {
+    //           const nameA = a.name.toUpperCase();
+    //           const nameB = b.name.toUpperCase();
+    //           return nameB < nameA ? -1 : nameB > nameA ? 1 : 0;
+    //         });
 
-    filter.name = filter.name && Number.parseInt(filter.name.toString());
-    const sortedJobsByName =
-      filter.province === undefined
-        ? cityJobs
-        : filter.name === 0
-          ? cityJobs.sort((a, b) => {
-              const nameA = a.name.toUpperCase();
-              const nameB = b.name.toUpperCase();
-              return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-            })
-          : cityJobs.sort((a, b) => {
-              const nameA = a.name.toUpperCase();
-              const nameB = b.name.toUpperCase();
-              return nameB < nameA ? -1 : nameB > nameA ? 1 : 0;
-            });
+    // filter.latest = filter.latest && Number.parseInt(filter.latest.toString());
+    // const sortedJobsByDate =
+    //   filter.latest === undefined
+    //     ? sortedJobsByName
+    //     : filter.latest === 0
+    //       ? sortedJobsByName.sort((a, b) => {
+    //           const dateA = new Date(a.created_at).getTime();
+    //           const dateB = new Date(b.created_at).getTime();
+    //           return dateA - dateB;
+    //         })
+    //       : sortedJobsByName.sort((a, b) => {
+    //           const dateA = new Date(a.created_at).getTime();
+    //           const dateB = new Date(b.created_at).getTime();
+    //           return dateB - dateA;
+    //         });
+    // filter.prices = filter.prices && Number.parseInt(filter.prices.toString());
+    // const sortedJobsByPrice =
+    //   filter.prices === undefined
+    //     ? sortedJobsByDate
+    //     : filter.prices === 0
+    //       ? sortedJobsByDate.sort((a, b) => a.base_price - b.base_price)
+    //       : sortedJobsByDate.sort((a, b) => b.base_price - a.base_price);
 
-    filter.latest = filter.latest && Number.parseInt(filter.latest.toString());
-    const sortedJobsByDate =
-      filter.latest === undefined
-        ? sortedJobsByName
-        : filter.latest === 0
-          ? sortedJobsByName.sort((a, b) => {
-              const dateA = new Date(a.created_at).getTime();
-              const dateB = new Date(b.created_at).getTime();
-              return dateA - dateB;
-            })
-          : sortedJobsByName.sort((a, b) => {
-              const dateA = new Date(a.created_at).getTime();
-              const dateB = new Date(b.created_at).getTime();
-              return dateB - dateA;
-            });
-    filter.prices = filter.prices && Number.parseInt(filter.prices.toString());
-    const sortedJobsByPrice =
-      filter.prices === undefined
-        ? sortedJobsByDate
-        : filter.prices === 0
-          ? sortedJobsByDate.sort((a, b) => a.base_price - b.base_price)
-          : sortedJobsByDate.sort((a, b) => b.base_price - a.base_price);
+    // return sortedJobsByPrice;
+  }
 
-    return sortedJobsByPrice;
+  async findJobByClient(clientId: string) {
+    const findJob = await this.jobRepository.find({
+      relations: { category: true },
+    });
+
+    const filterByUser = findJob.filter((job) => job.user.id === clientId);
+    if (!filterByUser)
+      throw new NotFoundException('User does not have any jobs associated');
+
+    return filterByUser;
+  }
+
+  //*Professional
+  async finishJob(finishJob: FinishJob) {
+    const findJob = await this.jobRepository.findOne({
+      where: { id: finishJob.jobId },
+      relations: ['postulations', 'postulations.user'],
+    });
+    if (!findJob) throw new NotFoundException('Job does not exist');
+
+    const findFinishJob = findJob.postulations.find(
+      (p) => p.user.id === finishJob.userId,
+    );
+    if (!findFinishJob)
+      throw new NotFoundException(
+        'Job does not have relationship with userProfessional',
+      );
+
+    await this.jobRepository.update(
+      { id: findJob.id },
+      { status: JobStatus.Finished },
+    );
+
+    return 'Job finished successfully by professional';
   }
 
   async findOne(id: string) {
     const findJob = await this.jobRepository.findOne({
       where: { id: id },
-      relations: { user: true },
+      relations: [
+        'category',
+        'user',
+        'postulations',
+        'postulations.user',
+        'postulations.user.categories',
+      ],
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 

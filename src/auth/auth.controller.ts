@@ -5,6 +5,7 @@ import {
   Post,
   Res,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
@@ -21,6 +22,7 @@ import { webcrypto } from 'crypto';
 import { escape } from 'querystring';
 import { modifyRole } from 'src/interceptor/mofifyRole.interceptor';
 import { modifyUserCreate } from 'src/interceptor/modifyUserCreate';
+import { validateRoleUser } from 'src/pipes/validateRoleUser';
 
 @Controller('auth')
 @ApiTags('Autenticacion')
@@ -77,6 +79,7 @@ export class AuthController {
     description: 'Registro de usuario',
   })
   @UseInterceptors(modifyUserCreate, modifyRole)
+  @UsePipes(validateRoleUser)
   @Post('signup')
   async singup(@Body() createUserDto: CreateUserDto) {
     return await this.authService.signUp(createUserDto);

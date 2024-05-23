@@ -38,44 +38,48 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @Max(10.0)
   rating?: number;
 
-  /**
-   * @example 11
-   * @description Pais del usuario
-   */
+  // /**
+  //  * @example 11
+  //  * @description Pais del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidCountry({
+  //   message: 'Pais invalido',
+  // })
+  @IsString()
   @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidCountry({
-    message: 'Pais invalido',
-  })
-  country: number;
+  country: string;
 
-  /**
-   * @example 3656
-   * @description id de la provincia del usuario
-   */
+  // /**
+  //  * @example 3656
+  //  * @description id de la provincia del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidProvince('country', {
+  //   message: 'Provincia invalida',
+  // })
+  @IsString()
   @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidProvince('country', {
-    message: 'Provincia invalida',
-  })
-  province: number;
+  province: string;
 
-  /**
-   * @example 682
-   * @description Id de la ciudad del usuario
-   */
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidCity('country', 'province', {
-    message: 'Ciudad invalida',
-  })
-  city: number;
+  // /**
+  //  * @example 682
+  //  * @description Id de la ciudad del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidCity('country', 'province', {
+  //   message: 'Ciudad invalida',
+  // })
+  // city: number;
 
   @IsOptional()
   @IsString()

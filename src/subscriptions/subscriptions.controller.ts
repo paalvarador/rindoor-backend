@@ -32,6 +32,11 @@ import {
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
+  @Get()
+  async getAllSubscriptions() {
+    return await this.subscriptionsService.getAllSubscriptions();
+  }
+
   @Get('plans')
   @ApiResponse({
     status: 200,

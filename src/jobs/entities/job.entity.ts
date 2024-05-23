@@ -14,10 +14,11 @@ import {
 } from 'typeorm';
 import { v4 as uuid } from 'uuid';
 
-enum JobStatus {
+export enum JobStatus {
   Active = 'active',
-  Pending = 'pending',
+  InProgress = 'InProgress',
   Cancelled = 'cancelled',
+  Finished = 'finished',
 }
 
 @Entity({ name: 'jobs' })
@@ -49,6 +50,11 @@ export class Job {
   @Column({
     type: 'varchar',
   })
+  coords: string;
+
+  @Column({
+    type: 'varchar',
+  })
   img: string;
 
   @CreateDateColumn()
@@ -65,7 +71,7 @@ export class Job {
   user: User;
 
   @OneToMany(() => Feedback, (feeback) => feeback.job)
-  feedback: Feedback[]
+  feedback: Feedback[];
 
   @OneToMany(() => Postulation, (postulations) => postulations.job)
   postulations: Postulation[];

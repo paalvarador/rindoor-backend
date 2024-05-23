@@ -21,6 +21,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
 
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
+
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;
 
@@ -31,21 +34,25 @@ export class User {
   phone: string;
 
   @Column({
-    type: 'numeric',
+    type: 'varchar',
     nullable: false,
-    default: 11,
   })
-  country: number;
+  country: string;
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  province: string;
 
-  @Column({ type: 'numeric', nullable: false, default: 3656 })
-  province: number;
-
-  @Column({ type: 'numeric', nullable: false, default: 682 })
-  city: number;
+  // @Column({ type: 'numeric', nullable: false, default: 682 })
+  // city: number;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
 
+  @Column({ type: 'varchar' })
+  coords: string
+  
   @Column({
     type: 'decimal',
     precision: 10,
@@ -61,7 +68,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: Role,
+    enum: [Role.CLIENT, Role.PROFESSIONAL],
     nullable: false,
   })
   role: Role;
