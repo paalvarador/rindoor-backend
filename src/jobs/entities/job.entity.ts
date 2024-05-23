@@ -16,7 +16,7 @@ import { v4 as uuid } from 'uuid';
 
 export enum JobStatus {
   Active = 'active',
-  Pending = 'pending',
+  InProgress = 'InProgress',
   Cancelled = 'cancelled',
   Finished = 'finished',
 }

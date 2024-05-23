@@ -21,8 +21,8 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
 
-  @Column({ type: 'boolean', default: false })
-  banned: boolean;
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;
@@ -50,6 +50,9 @@ export class User {
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
 
+  @Column({ type: 'varchar' })
+  coords: string
+  
   @Column({
     type: 'decimal',
     precision: 10,

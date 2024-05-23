@@ -40,7 +40,7 @@ export class PostulationsService {
 
     if (findUser.role !== 'PROFESSIONAL')
       throw new BadRequestException('Acesso solo para los Profesionales');
-    if (findUser.banned === true)
+    if (findUser.isActive === false)
       throw new UnauthorizedException('Usuario Baneado');
 
     const findJob = await this.jobRepository.findOne({
@@ -111,7 +111,7 @@ export class PostulationsService {
 
     await this.jobRepository.update(
       { id: samePostulation.id },
-      { status: JobStatus.Pending },
+      { status: JobStatus.InProgress },
     );
 
     return 'Postulation closed by user';

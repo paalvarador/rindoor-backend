@@ -35,7 +35,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
-    if (user.banned === true)
+    if (user.isActive === false)
       throw new UnauthorizedException('Usuario Baneado');
     // const userCountryName = await findCountryName(user.country);
     // const userState = await findState(user.province);

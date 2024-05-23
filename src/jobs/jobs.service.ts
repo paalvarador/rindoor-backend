@@ -37,7 +37,7 @@ export class JobsService {
     if (!foundUser) throw new NotFoundException('Usuario not found');
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
-    if (foundUser.banned === true)
+    if (foundUser.isActive === false)
       throw new UnauthorizedException('Usuario Baneado');
 
     const foundCategory = await this.categoryRepository.findOne({
