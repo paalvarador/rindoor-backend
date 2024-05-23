@@ -44,15 +44,15 @@ export class User {
   })
   province: string;
 
-  // @Column({ type: 'numeric', nullable: false, default: 682 })
-  // city: number;
+  @Column({ type: 'varchar', nullable: false, default: 682 })
+  city: number;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
 
-  @Column({ type: 'varchar' })
-  coords: string
-  
+  @Column({ type: 'varchar', nullable: true })
+  coords?: string;
+
   @Column({
     type: 'decimal',
     precision: 10,

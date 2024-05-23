@@ -49,8 +49,24 @@ export class Job {
 
   @Column({
     type: 'varchar',
+    nullable: false,
   })
-  coords: string;
+  country: string;
+
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  province: string;
+
+  @Column({ type: 'varchar', nullable: false, default: 682 })
+  city: number;
+
+  @Column({ type: 'varchar', length: 100, nullable: false })
+  address: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  coords?: string;
 
   @Column({
     type: 'varchar',
