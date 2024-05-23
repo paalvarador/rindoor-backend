@@ -82,7 +82,6 @@ export class AuthController {
   @UsePipes(validateRoleUser)
   @Post('signup')
   async singup(@Body() createUserDto: CreateUserDto) {
-    console.log('createUserDto', createUserDto);
-    // return await this.authService.signUp(createUserDto);
+    return await this.authService.signUp(createUserDto);
   }
 }
