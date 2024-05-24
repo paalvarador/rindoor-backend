@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { Category } from 'src/category/entities/category.entity';
+import { geocode } from 'src/utils/coords';
 
 @Injectable()
 export class UserService {
@@ -37,7 +38,15 @@ export class UserService {
       where: { email: createUserDto.email },
     });
     if (userDB) throw new ConflictException('Usuario ya existe');
-    const userToSave = { ...createUserDto };
+    const country = createUserDto.country;
+    const province = createUserDto.province;
+    const city = createUserDto.city;
+    const address = createUserDto.address;
+
+    const coords = await geocode(country, province, city, address);
+
+    const userToSave = { ...createUserDto, coords: coords };
+
     const newUser = await this.userRepository.save(userToSave);
     return newUser;
   }
@@ -157,5 +166,12 @@ export class UserService {
       customerId,
       subscriptionId,
     });
+  }
+
+  async banUser(id: string) {
+    const findUser = await this.findOne(id);
+    if (!findUser) throw new NotFoundException('Usuario no encontrado');
+    await this.userRepository.update(findUser.id, { isActive: false });
+    return 'Usuario Baneado';
   }
 }

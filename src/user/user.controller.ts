@@ -70,6 +70,11 @@ export class UserController {
     return user;
   }
 
+  @Put('banned/:id')
+  async banUser(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.userService.banUser(id);
+  }
+
   @ApiResponse({
     status: 200,
     description: 'Listar todos los usuarios exitosamente',

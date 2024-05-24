@@ -92,6 +92,14 @@ export class CreateUserDto {
   // city: string;
 
   /**
+   * @example Buenos Aires
+   * @description nombre de la ciudad del usuario
+   */
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  /**
    * @example 'Calle 12B # 12-12'
    * @description Address of the user
    */

@@ -4,6 +4,8 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  Length,
+  MaxLength,
   Validate,
 } from 'class-validator';
 import { checkDecimal } from 'src/decorators/checkDecimal.decorator';
@@ -22,9 +24,38 @@ export class CreateJobDto {
   @Validate(checkDecimal)
   base_price: number;
 
-  @IsNotEmpty()
+  /**
+   * @example Argentina
+   * @description Pais del usuario
+   */
   @IsString()
-  coords: string;
+  @IsNotEmpty()
+  country: string;
+
+  /**
+   * @example Buenos Aires
+   * @description nombre de la provincia del usuario
+   */
+  @IsString()
+  @IsNotEmpty()
+  province: string;
+
+  /**
+   * @example Buenos Aires
+   * @description nombre de la ciudad del usuario
+   */
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  /**
+   * @example 'Calle 12B # 12-12'
+   * @description Address of the user
+   */
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  address: string;
 
   @IsNotEmpty()
   @IsUUID()

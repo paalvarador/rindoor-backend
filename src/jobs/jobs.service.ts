@@ -18,6 +18,7 @@ import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { body } from 'src/utils/body';
 import { FinishJob } from './dto/finishJob.dto';
+import { geocode } from 'src/utils/coords';
 
 @Injectable()
 export class JobsService {
@@ -56,12 +57,19 @@ export class JobsService {
       }
       imgUrl = imgUpload.url;
     }
+    const country = createJobDto.country;
+    const province = createJobDto.province;
+    const city = createJobDto.city;
+    const address = createJobDto.address;
+
+    const coords = await geocode(country, province, city, address);
 
     const newJob = {
       ...createJobDto,
       category: foundCategory,
       user: foundUser,
       img: imgUrl,
+      coords: coords,
     };
     return await this.jobRepository.save(newJob);
   }
