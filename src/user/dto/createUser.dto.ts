@@ -122,10 +122,7 @@ export class CreateUserDto {
    * @description Categorias del usuario
    */
   @IsOptional()
-  @ValidateNested({ each: true })
-  @IsObject({ each: true })
   @IsArray()
-  @IsInstance(CategoryId, { each: true })
   @Type(() => CategoryId)
   @IsDefined({ each: true })
   categories: CategoryId[];
