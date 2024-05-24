@@ -92,6 +92,26 @@ export const jobApiBody = {
         description: 'Categoria del trabajo',
         example: '36fda476-60ba-4da8-ae02-c9c1d9c3abf8',
       },
+      country: {
+        type: 'string',
+        description: 'Pais del trabajo a realizar',
+        example: 'Argentina',
+      },
+      province: {
+        type: 'string',
+        description: 'Provincia del trabajo a realizar',
+        example: 'Buenos Aires',
+      },
+      city: {
+        type: 'string',
+        description: 'Ciudad del trabajo a realizar',
+        example: 'Mercedes',
+      },
+      address: {
+        type: 'string',
+        description: 'Direccion del trabajo a realizar',
+        example: 'Calle 30 626',
+      },
       userId: {
         type: 'string',
         description: 'ID de Usuario',
@@ -105,6 +125,10 @@ export const jobApiBody = {
       'categoryId',
       'userId',
       'file',
+      'country',
+      'province',
+      'city',
+      'address',
     ],
   },
 };
