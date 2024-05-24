@@ -59,8 +59,8 @@ export class Job {
   })
   province: string;
 
-  @Column({ type: 'varchar', nullable: false, default: 682 })
-  city: number;
+  @Column({ type: 'varchar', nullable: false })
+  city: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
