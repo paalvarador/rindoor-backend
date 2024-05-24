@@ -171,7 +171,13 @@ export class UserService {
   async banUser(id: string) {
     const findUser = await this.findOne(id);
     if (!findUser) throw new NotFoundException('Usuario no encontrado');
+
     await this.userRepository.update(findUser.id, { isActive: false });
-    return 'Usuario Baneado';
+
+    const updatedUser = await this.userRepository.findOne({
+      where: { id: findUser.id },
+    });
+
+    return updatedUser;
   }
 }
