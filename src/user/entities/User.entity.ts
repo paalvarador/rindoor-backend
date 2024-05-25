@@ -68,7 +68,7 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: [Role.CLIENT, Role.PROFESSIONAL],
+    enum: [Role.CLIENT, Role.PROFESSIONAL, Role.ADMIN],
     nullable: false,
   })
   role: Role;

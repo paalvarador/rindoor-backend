@@ -75,27 +75,32 @@ export class JobsService {
   }
 
   async findAll(filter?: filterJobCategory) {
-    const { page, limit, categories, minPrice, maxPrice } = filter;
+    const {
+      page,
+      limit,
+      categories,
+      minPrice,
+      maxPrice,
+      name,
+      latest,
+      prices,
+    } = filter || {};
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
     let defaultCategories = categories || [];
 
-    if (Array.isArray(categories)) {
+    if (typeof categories === 'string') {
+      defaultCategories = [categories];
+    } else if (Array.isArray(categories)) {
       defaultCategories = categories;
-    } else if (categories) {
-      if (typeof categories === 'string') {
-        defaultCategories = [categories];
-      } else if (categories) {
-        defaultCategories = [categories];
-      }
     }
 
     defaultCategories = defaultCategories.map((category) =>
       category.trim().toLowerCase().normalize(),
     );
 
-    const defaultMinPrice = minPrice || 0;
-    const defaultMaxPrice = maxPrice || 999999999.99;
+    const defaultMinPrice = minPrice ?? 0;
+    const defaultMaxPrice = maxPrice ?? 999999999.99;
 
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
@@ -104,20 +109,59 @@ export class JobsService {
       relations: { category: true, user: true },
     });
 
-    const filterJobs = jobs.filter(
+    let filterJobs = jobs.filter(
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
 
-    const filterCategories = categories
-      ? filterJobs.filter((job) =>
-          defaultCategories.includes(
-            job.category.name.toLowerCase().trim().normalize(),
-          ),
-        )
-      : filterJobs;
-    const sliceJobs = filterCategories.slice(startIndex, endIndex);
-    return sliceJobs;
+    if (defaultCategories.length > 0) {
+      filterJobs = filterJobs.filter((job) =>
+        defaultCategories.includes(
+          job.category.name.toLowerCase().trim().normalize(),
+        ),
+      );
+    }
+
+    const parsedName =
+      name !== undefined ? Number.parseInt(name.toString()) : undefined;
+    const parsedLatest =
+      latest !== undefined ? Number.parseInt(latest.toString()) : undefined;
+    const parsedPrices =
+      prices !== undefined ? Number.parseInt(prices.toString()) : undefined;
+
+    filterJobs = filterJobs.sort((a, b) => {
+      if (parsedName !== undefined) {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        const comparison = nameA.localeCompare(nameB);
+        if (comparison !== 0) {
+          return parsedName === 0 ? comparison : -comparison;
+        }
+      }
+
+      if (parsedLatest !== undefined) {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        const comparison = dateA - dateB;
+        if (comparison !== 0) {
+          return parsedLatest === 0 ? comparison : -comparison;
+        }
+      }
+
+      if (parsedPrices !== undefined) {
+        const comparison = a.base_price - b.base_price;
+        if (comparison !== 0) {
+          return parsedPrices === 0 ? comparison : -comparison;
+        }
+      }
+
+      return 0;
+    });
+
+    const paginatedJobs = filterJobs.slice(startIndex, endIndex);
+    return paginatedJobs;
+    // const sliceJobs = filterCategories.slice(startIndex, endIndex);
+    // return sliceJobs;
     // const countryJobs = !filter.country
     //   ? sliceJobs
     //   : sliceJobs.filter((job) => job.user.country === filter.country);
@@ -131,19 +175,15 @@ export class JobsService {
 
     // filter.name = filter.name && Number.parseInt(filter.name.toString());
     // const sortedJobsByName =
-    //   filter.province === undefined
-    //     ? cityJobs
-    //     : filter.name === 0
-    //       ? cityJobs.sort((a, b) => {
-    //           const nameA = a.name.toUpperCase();
-    //           const nameB = b.name.toUpperCase();
-    //           return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    //         })
-    //       : cityJobs.sort((a, b) => {
-    //           const nameA = a.name.toUpperCase();
-    //           const nameB = b.name.toUpperCase();
-    //           return nameB < nameA ? -1 : nameB > nameA ? 1 : 0;
-    //         });
+    //   filter.name !== undefined
+    //     ? filterCategories.slice().sort((a, b) => {
+    //         const nameA = a.name.toUpperCase();
+    //         const nameB = b.name.toUpperCase();
+    //         return filter.name === 0
+    //           ? nameA.localeCompare(nameB) // Ascendente
+    //           : nameB.localeCompare(nameA); // Descendente
+    //       })
+    //     : filterCategories;
 
     // filter.latest = filter.latest && Number.parseInt(filter.latest.toString());
     // const sortedJobsByDate =
@@ -168,7 +208,8 @@ export class JobsService {
     //       ? sortedJobsByDate.sort((a, b) => a.base_price - b.base_price)
     //       : sortedJobsByDate.sort((a, b) => b.base_price - a.base_price);
 
-    // return sortedJobsByPrice;
+    // const sliceJob = sortedJobsByPrice.slice(startIndex, endIndex);
+    // return sliceJob
   }
 
   async findJobByClient(clientId: string) {
