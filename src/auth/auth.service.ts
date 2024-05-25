@@ -36,7 +36,7 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
     if (user.isActive === false)
-      throw new UnauthorizedException('Usuario Baneado');
+      return { message: 'Usuario Baneado', user: user };
     // const userCountryName = await findCountryName(user.country);
     // const userState = await findState(user.province);
     // const userCity = await findCity(user.city);
