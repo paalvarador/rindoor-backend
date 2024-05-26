@@ -36,10 +36,12 @@ export class JobsService {
       where: { id: createJobDto.userId },
     });
     if (!foundUser) throw new NotFoundException('Usuario not found');
+
+    if (foundUser.isActive === false)
+      return { message: 'Usuario Baneado', user: foundUser };
+
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
-    if (foundUser.isActive === false)
-      throw new UnauthorizedException('Usuario Baneado');
 
     const foundCategory = await this.categoryRepository.findOne({
       where: { id: createJobDto.categoryId },
