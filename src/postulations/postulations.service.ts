@@ -38,11 +38,10 @@ export class PostulationsService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    if (findUser.isActive === false)
-      return { message: 'Usuario Baneado', user: findUser };
-
     if (findUser.role !== 'PROFESSIONAL')
       throw new BadRequestException('Acesso solo para los Profesionales');
+    if (findUser.isActive === false)
+      throw new UnauthorizedException('Usuario Baneado');
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
