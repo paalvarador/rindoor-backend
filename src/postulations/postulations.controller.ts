@@ -144,8 +144,8 @@ export class PostulationsController {
     return this.postulationsService.remove(id);
   }
 
-  @Put('cancel')
-  cancelPostulationByClient(@Body() closePostulation: ClosePostulation) {
-    return this.postulationsService.cancelPostulationByClient(closePostulation);
+  @Put('close')
+  closePostulationByClient(@Body() closePostulation: ClosePostulation) {
+    return this.postulationsService.closePostulationByClient(closePostulation);
   }
 }
