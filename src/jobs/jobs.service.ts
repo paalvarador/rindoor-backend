@@ -67,7 +67,7 @@ export class JobsService {
     const newJob = {
       ...createJobDto,
       category: foundCategory,
-      user: foundUser,
+      client: foundUser,
       img: imgUrl,
       coords: coords,
     };
@@ -106,7 +106,7 @@ export class JobsService {
     const endIndex = startIndex + defaultLimit;
 
     const jobs = await this.jobRepository.find({
-      relations: { category: true, user: true },
+      relations: { category: true },
     });
 
     let filterJobs = jobs.filter(
@@ -217,7 +217,7 @@ export class JobsService {
       relations: { category: true },
     });
 
-    const filterByUser = findJob.filter((job) => job.user.id === clientId);
+    const filterByUser = findJob.filter((job) => job.client.id === clientId);
     if (!filterByUser)
       throw new NotFoundException('User does not have any jobs associated');
 
@@ -235,6 +235,7 @@ export class JobsService {
     const findFinishJob = findJob.postulations.find(
       (p) => p.user.id === finishJob.userId,
     );
+    
     if (!findFinishJob)
       throw new NotFoundException(
         'Job does not have relationship with userProfessional',
@@ -253,7 +254,7 @@ export class JobsService {
       where: { id: id },
       relations: [
         'category',
-        'user',
+        'client',
         'postulations',
         'postulations.user',
         'postulations.user.categories',
@@ -267,11 +268,11 @@ export class JobsService {
   async remove(id: string) {
     const findJob = await this.jobRepository.findOne({
       where: { id: id },
-      relations: { user: true },
+      relations: { client: true },
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
-    if (findJob.user.role !== 'CLIENT')
+    if (findJob.client.id !== 'CLIENT')
       throw new BadRequestException('Action just for Clients');
 
     await this.jobRepository.remove(findJob);
@@ -282,7 +283,7 @@ export class JobsService {
   @Cron('0 8 * * 1-5')
   async handleCron() {
     const jobs = await this.jobRepository.find({
-      relations: ['user', 'category'],
+      relations: ['professional', 'category'],
     });
     const users = await this.userRepository.find({
       relations: { categories: true },
