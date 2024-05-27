@@ -124,7 +124,6 @@ export class SubscriptionsController {
     required: true,
     schema: {
       type: 'string',
-      format: 'uuid',
       example: 'sub_1PHHOJCB2wIFzJhtbx6GqhLl',
     },
   })

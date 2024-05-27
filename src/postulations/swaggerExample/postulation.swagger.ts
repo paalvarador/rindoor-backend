@@ -97,3 +97,15 @@ export const postulationApiParam = {
     example: 'ae9adf60-a876-4045-af44-25e3eca75613',
   },
 };
+
+export const accessOnlyProfessional = {
+  status: 401,
+  description: 'Acceso solo para los Profesionales',
+  schema: {
+    example: {
+      message: 'Acesso solo para los Profesionales',
+      error: 'Unauthorized',
+      statusCode: 401,
+    },
+  },
+};

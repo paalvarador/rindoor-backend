@@ -16,6 +16,8 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { PostulationCreatedEvent } from './PostulationCreatedEvent';
 import { body2 } from 'src/utils/bodyPostulation';
 import { ClosePostulation } from './dto/closePostulation.dto';
+import { PostulationClosedEvent } from './PostulationClosedEvent';
+import { generatePostulationClosed } from 'src/utils/bodyPostulationClosed';
 
 @Injectable()
 export class PostulationsService {
@@ -46,9 +48,24 @@ export class PostulationsService {
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
-      relations: { category: true },
+      relations: ['category', 'postulations'],
     });
+
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    const postulationsDB = await Promise.all(
+      findJob.postulations.map(async (postulation) => {
+        return await this.postulationRepository.findOne({
+          where: { id: postulation.id },
+          relations: ['user'],
+        });
+      }),
+    );
+    const userAlreadyPostulate = postulationsDB.some(
+      (postulation) => postulation.user.id === findUser.id,
+    );
+    if (userAlreadyPostulate)
+      throw new BadRequestException('Usuario ya postulado a este trabajo');
 
     if (
       !findUser.categories.find(
@@ -56,7 +73,6 @@ export class PostulationsService {
       )
     )
       throw new UnauthorizedException('Usuario no posee esta categoria');
-
     const newPostulation = {
       ...createPostulationDto,
       user: findUser,
@@ -94,14 +110,19 @@ export class PostulationsService {
       relations: ['jobsAsClient', 'jobsAsClient.postulations'],
     });
 
-    if (!findUser) throw new NotFoundException('User not found');
+    if (!findUser) throw new NotFoundException('Usuario no encontrado');
 
     const findPostulation = await this.postulationRepository.findOne({
       where: { id: closePostulation.postulationId },
-      relations: { user: true },
+      relations: ['job', 'user', 'job.client'],
     });
 
-    if (!findPostulation) throw new NotFoundException('Postulation not found');
+    if (!findPostulation)
+      throw new NotFoundException('Postulacion no encontrada');
+    if (findPostulation.job.client.id !== findUser.id)
+      throw new UnauthorizedException('Usuario no autorizado');
+    if (findPostulation.status === PostulationStatus.CLOSED)
+      throw new BadRequestException('Postulacion ya cerrada');
 
     const samePostulation = findUser.jobsAsClient.find((job) =>
       job.postulations.some(
@@ -111,7 +132,7 @@ export class PostulationsService {
 
     if (!samePostulation)
       throw new NotFoundException(
-        "Postulation is not relationated with any user's job",
+        'Postulacion no encontrada en los trabajos del usuario',
       );
 
     await this.postulationRepository.update(
@@ -128,7 +149,12 @@ export class PostulationsService {
       where: { id: samePostulation.id },
     });
 
-    return { message: 'Postulation closed by user', job: sendJob };
+    this.eventEmitter.emit(
+      'postulation.closed',
+      new PostulationClosedEvent(findPostulation.id),
+    );
+
+    return { message: 'Postulacion aceptada por el usuario', job: sendJob };
   }
 
   async findOne(id: string) {
@@ -179,11 +205,38 @@ export class PostulationsService {
       userClientEmail,
       `Nueva postutation al trabajo ${findPostulationById.job.name}`,
       findPostulationById,
+      findPostulationById.job,
+      findPostulationById.user.name,
     );
     const mail = {
       to: userClientEmail,
       subject: 'Nueva postutation',
       text: 'hola',
+      template: template,
+    };
+    await this.emailService.sendPostulation(mail);
+  }
+
+  @OnEvent('postulation.closed')
+  private async sendEmailPostulationClosed(payload: PostulationClosedEvent) {
+    const postulationId = Object.values(payload)[0];
+
+    const findPostulationById = await this.postulationRepository.findOne({
+      where: {
+        id: postulationId,
+      },
+      relations: ['user', 'job', 'job.client'],
+    });
+
+    const template = generatePostulationClosed(
+      findPostulationById.job.client.name,
+      findPostulationById.job,
+      findPostulationById.user.name,
+    );
+    const mail = {
+      to: findPostulationById.user.email,
+      subject: 'Postulacion aceptada',
+      text: '',
       template: template,
     };
     await this.emailService.sendPostulation(mail);

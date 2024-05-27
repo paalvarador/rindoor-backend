@@ -180,4 +180,11 @@ export class UserService {
 
     return updatedUser;
   }
+
+  async findByCustomerIdStripe(customerId: string) {
+    const user = await this.userRepository.findOne({
+      where: { customerId },
+    });
+    return user;
+  }
 }
