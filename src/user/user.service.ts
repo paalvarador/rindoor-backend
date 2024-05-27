@@ -155,8 +155,9 @@ export class UserService {
     });
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.delete({ id: id });
-    return `Usuario eliminado`;
+    await this.userRepository.update({ id: id }, { isActive: false });
+
+    return `Usuario Desactivado`;
   }
 
   async setSubscription(
@@ -201,7 +202,7 @@ export class UserService {
     const findUser = await this.findOne(id);
     if (!findUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.update(findUser.id, { isActive: false });
+    await this.userRepository.update(findUser.id, { banned: true });
 
     const updatedUser = await this.userRepository.findOne({
       where: { id: findUser.id },

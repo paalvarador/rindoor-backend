@@ -42,7 +42,7 @@ export class JobsService {
     // if (!foundUser.subscriptionId)
     //   throw new BadRequestException('Usuario no tiene una suscripcion activa');
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
-    if (foundUser.isActive === false)
+    if (foundUser.banned === true)
       return { message: 'usuario baneado', user: foundUser };
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
