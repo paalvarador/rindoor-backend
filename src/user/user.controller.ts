@@ -198,7 +198,7 @@ export class UserController {
     return updatedUser;
   }
 
-  @Delete('/:id')
+  @Put('/:id')
   // @Roles(Role.CLIENT, Role.PROFESSIONAL)
   // @UseGuards(GuardToken2, guardRoles)
   //@ApiUnauthorizedResponse()

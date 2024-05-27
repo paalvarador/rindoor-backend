@@ -179,6 +179,11 @@ export class JobsController {
     return this.jobsService.finishJob(finishJob);
   }
 
+  @Put('banned/:id')
+  banJob(@Param('id', ParseUUIDPipe) jobId: string) {
+    return this.jobsService.banJob(jobId);
+  }
+
   @HttpCode(204)
   @ApiResponse({
     status: 204,
