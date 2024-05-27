@@ -40,7 +40,7 @@ export class PostulationsService {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    if (findUser.banned === true)
+    if (findUser.isActive === false)
       return { message: 'usuario baneado', user: findUser };
 
     if (findUser.role !== 'PROFESSIONAL')

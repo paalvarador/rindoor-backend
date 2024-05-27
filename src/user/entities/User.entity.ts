@@ -21,9 +21,6 @@ export class User {
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
-  
-  @Column({ type: 'boolean', default: false })
-  banned: boolean;
 
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;

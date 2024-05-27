@@ -202,7 +202,7 @@ export class UserService {
     const findUser = await this.findOne(id);
     if (!findUser) throw new NotFoundException('Usuario no encontrado');
 
-    await this.userRepository.update(findUser.id, { banned: true });
+    await this.userRepository.update(findUser.id, { isActive: false });
 
     const updatedUser = await this.userRepository.findOne({
       where: { id: findUser.id },
