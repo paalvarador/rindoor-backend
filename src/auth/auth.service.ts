@@ -58,7 +58,6 @@ export class AuthService {
       rating: user.rating,
     };
     if (user.role === Role.CLIENT) {
-      console.log('*************PASA POR AQUI************');
       userPayload['jobs'] = JSON.stringify(user.jobsAsClient);
     }
     if (user.role === Role.PROFESSIONAL) {
@@ -74,7 +73,7 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userRepository.findOneBy({ email: email });
 
     if (user) throw new BadRequestException('Usuario ya existe');
 
