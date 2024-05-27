@@ -188,13 +188,17 @@ export class JobsService {
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
+    if (findJob.status === JobStatus.Finished)
+      throw new BadRequestException('El trabajo ya ha sido finalizado');
+    if (findJob.status !== JobStatus.InProgress)
+      throw new BadRequestException(
+        'No se puede finalizar un trabajo no iniciado',
+      );
+
     if (findJob.professional.id !== finishJob.userId)
       throw new UnauthorizedException(
         'Solo el profesional encargado puede finalizar',
       );
-
-    if (findJob.status === JobStatus.Finished)
-      throw new BadRequestException('El trabajo ya ha sido finalizado');
 
     const findFinishJob = findJob.postulations.find(
       (p) => p.user.id === finishJob.userId,

@@ -12,6 +12,8 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { PaginationQuery } from 'src/dto/pagintation.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { geocode } from 'src/utils/coords';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
+import { Job } from 'src/jobs/entities/job.entity';
 
 @Injectable()
 export class UserService {
@@ -20,6 +22,10 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    @InjectRepository(Postulation)
+    private postulationRepository: Repository<Postulation>,
+    @InjectRepository(Job)
+    private jobRepository: Repository<Job>,
   ) {}
   async create(createUserDto: CreateUserDto) {
     if (!createUserDto) throw new BadRequestException('Usuario es requerido');
@@ -70,9 +76,32 @@ export class UserService {
   async findByEmail(email: string) {
     const userDB = await this.userRepository.findOne({
       where: { email },
-      relations: ['categories'],
+      relations: ['categories', 'postulations', 'jobsAsClient'],
     });
-    // if (!userDB) throw new NotFoundException('Usuario no encontrado');
+
+    if (!userDB) throw new NotFoundException('Usuario no encontrado');
+
+    const postulationsDB = await Promise.all(
+      userDB.postulations.map(async (postulation) => {
+        const postulationDB = await this.postulationRepository.findOne({
+          where: { id: postulation.id },
+          relations: ['job'],
+        });
+        return postulationDB;
+      }),
+    );
+    userDB.postulations = postulationsDB;
+
+    const jobsAsClientDB = await Promise.all(
+      userDB.jobsAsClient.map(async (job) => {
+        const jobDB = await this.jobRepository.findOne({
+          where: { id: job.id },
+          relations: ['postulations'],
+        });
+        return jobDB;
+      }),
+    );
+    userDB.jobsAsClient = jobsAsClientDB;
     return userDB;
   }
 

@@ -8,9 +8,11 @@ import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
+import { Job } from 'src/jobs/entities/job.entity';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([User, Category])],
+  imports: [UserModule, TypeOrmModule.forFeature([User, Category, Postulation, Job])],
   controllers: [AuthController],
   providers: [AuthService, EmailService, UserService],
 })
