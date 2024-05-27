@@ -166,56 +166,6 @@ export class JobsService {
 
     const paginatedJobs = filterJobs.slice(startIndex, endIndex);
     return paginatedJobs;
-    // const sliceJobs = filterCategories.slice(startIndex, endIndex);
-    // return sliceJobs;
-    // const countryJobs = !filter.country
-    //   ? sliceJobs
-    //   : sliceJobs.filter((job) => job.user.country === filter.country);
-
-    // const stateJobs = !filter.province
-    //   ? countryJobs
-    //   : countryJobs.filter((job) => job.user.province === filter.province);
-    // const cityJobs = !filter.city
-    //   ? stateJobs
-    //   : stateJobs.filter((job) => job.user.city === filter.city);
-
-    // filter.name = filter.name && Number.parseInt(filter.name.toString());
-    // const sortedJobsByName =
-    //   filter.name !== undefined
-    //     ? filterCategories.slice().sort((a, b) => {
-    //         const nameA = a.name.toUpperCase();
-    //         const nameB = b.name.toUpperCase();
-    //         return filter.name === 0
-    //           ? nameA.localeCompare(nameB) // Ascendente
-    //           : nameB.localeCompare(nameA); // Descendente
-    //       })
-    //     : filterCategories;
-
-    // filter.latest = filter.latest && Number.parseInt(filter.latest.toString());
-    // const sortedJobsByDate =
-    //   filter.latest === undefined
-    //     ? sortedJobsByName
-    //     : filter.latest === 0
-    //       ? sortedJobsByName.sort((a, b) => {
-    //           const dateA = new Date(a.created_at).getTime();
-    //           const dateB = new Date(b.created_at).getTime();
-    //           return dateA - dateB;
-    //         })
-    //       : sortedJobsByName.sort((a, b) => {
-    //           const dateA = new Date(a.created_at).getTime();
-    //           const dateB = new Date(b.created_at).getTime();
-    //           return dateB - dateA;
-    //         });
-    // filter.prices = filter.prices && Number.parseInt(filter.prices.toString());
-    // const sortedJobsByPrice =
-    //   filter.prices === undefined
-    //     ? sortedJobsByDate
-    //     : filter.prices === 0
-    //       ? sortedJobsByDate.sort((a, b) => a.base_price - b.base_price)
-    //       : sortedJobsByDate.sort((a, b) => b.base_price - a.base_price);
-
-    // const sliceJob = sortedJobsByPrice.slice(startIndex, endIndex);
-    // return sliceJob
   }
 
   async findJobByClient(clientId: string) {
@@ -282,6 +232,19 @@ export class JobsService {
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
     return findJob;
+  }
+
+  async banJob(jobId: string) {
+    const findJob = await this.jobRepository.findOne({ where: { id: jobId } });
+
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    await this.jobRepository.update({ id: jobId }, { banned: true });
+
+    const updatedJob = await this.jobRepository.findOne({
+      where: { id: findJob.id },
+    });
+    return updatedJob;
   }
 
   async remove(id: string) {
