@@ -20,6 +20,7 @@ import {
   findCountryName,
   findState,
 } from 'src/ubication/utils/fsUtil.util';
+import { Role } from 'src/user/entities/Role.enum';
 
 @Injectable()
 export class AuthService {
@@ -56,6 +57,13 @@ export class AuthService {
       address: user.address,
       rating: user.rating,
     };
+    if (user.role === Role.CLIENT) {
+      console.log('*************PASA POR AQUI************');
+      userPayload['jobs'] = JSON.stringify(user.jobsAsClient);
+    }
+    if (user.role === Role.PROFESSIONAL) {
+      userPayload['postulations'] = JSON.stringify(user.postulations);
+    }
 
     const token = this.jwtService.sign(userPayload);
 
