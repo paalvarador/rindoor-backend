@@ -39,8 +39,8 @@ export class JobsService {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
-    if (!foundUser.subscriptionId)
-      throw new BadRequestException('Usuario no tiene una suscripcion activa');
+    // if (!foundUser.subscriptionId)
+    //   throw new BadRequestException('Usuario no tiene una suscripcion activa');
     if (!foundUser) throw new NotFoundException('Usuario no encontrado');
     if (foundUser.isActive === false)
       return { message: 'usuario baneado', user: foundUser };
