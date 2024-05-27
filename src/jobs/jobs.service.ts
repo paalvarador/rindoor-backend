@@ -19,6 +19,9 @@ import { EmailService } from 'src/email/email.service';
 import { body } from 'src/utils/body';
 import { FinishJob } from './dto/finishJob.dto';
 import { geocode } from 'src/utils/coords';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { JobFinishedEvent } from './JobFinishedEvent';
+import { generateJobFinished } from 'src/utils/bodyFinishedJob';
 
 @Injectable()
 export class JobsService {
@@ -29,13 +32,16 @@ export class JobsService {
     private categoryRepository: Repository<Category>,
     private fileUploadService: FileUpload,
     private emailService: EmailService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(createJobDto: CreateJobDto, file) {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
-    if (!foundUser) throw new NotFoundException('Usuario not found');
+    if (!foundUser.subscriptionId)
+      throw new BadRequestException('Usuario no tiene una suscripcion activa');
+    if (!foundUser) throw new NotFoundException('Usuario no encontrado');
     if (foundUser.isActive === false)
       return { message: 'usuario baneado', user: foundUser };
     if (foundUser.role !== 'CLIENT')
@@ -228,22 +234,35 @@ export class JobsService {
   async finishJob(finishJob: FinishJob) {
     const findJob = await this.jobRepository.findOne({
       where: { id: finishJob.jobId },
-      relations: ['postulations', 'postulations.user'],
+      relations: ['postulations', 'postulations.user', 'professional'],
     });
-    if (!findJob) throw new NotFoundException('Job does not exist');
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    if (findJob.professional.id !== finishJob.userId)
+      throw new UnauthorizedException(
+        'Solo el profesional encargado puede finalizar',
+      );
+
+    if (findJob.status === JobStatus.Finished)
+      throw new BadRequestException('El trabajo ya ha sido finalizado');
 
     const findFinishJob = findJob.postulations.find(
       (p) => p.user.id === finishJob.userId,
     );
-    
+
     if (!findFinishJob)
       throw new NotFoundException(
-        'Job does not have relationship with userProfessional',
+        'Trabajo no encontrado para este profesional',
       );
 
     await this.jobRepository.update(
       { id: findJob.id },
       { status: JobStatus.Finished },
+    );
+
+    this.eventEmitter.emit(
+      'job.finished',
+      new JobFinishedEvent(finishJob.jobId),
     );
 
     return 'Job finished successfully by professional';
@@ -327,5 +346,34 @@ export class JobsService {
 
       this.emailService.sendPostulation(mail);
     });
+  }
+
+  @OnEvent('job.finished')
+  private async sendEmail(payload: JobFinishedEvent) {
+    const jobId = Object.values(payload)[0];
+
+    const findJobById = await this.jobRepository.findOne({
+      where: {
+        id: jobId,
+      },
+      relations: ['client', 'professional'],
+    });
+
+    const userClientEmail = findJobById.client.email;
+
+    const template = generateJobFinished(
+      userClientEmail,
+      findJobById,
+      findJobById.professional.name,
+    );
+
+    const mail = {
+      to: userClientEmail,
+      subject: 'Trabajo Finalizado',
+      text: '',
+      template: template,
+    };
+
+    await this.emailService.sendPostulation(mail);
   }
 }
