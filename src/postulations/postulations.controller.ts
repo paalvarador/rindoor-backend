@@ -71,9 +71,9 @@ export class PostulationsController {
     summary: 'Crear postulación',
     description: 'Crea una postulación a un trabajo',
   })
-  // @ApiBearerAuth()
-  // @Roles(Role.PROFESSIONAL)
-  // @UseGuards(GuardToken, guardRoles)
+  @ApiBearerAuth()
+  @Roles(Role.PROFESSIONAL)
+  @UseGuards(GuardToken, guardRoles)
   @Post()
   @UseInterceptors(modifyPostulation)
   create(@Body() createPostulationDto: CreatePostulationDto) {
@@ -115,31 +115,34 @@ export class PostulationsController {
     return this.postulationsService.findOne(id);
   }
 
-  @HttpCode(204)
-  @ApiResponse({
-    status: 204,
-    description: 'Postulación eliminada',
-    schema: {
-      example: {
-        message: `Postulacion con id: ${exampleCreatedPostulation.id} eliminada`,
-      },
-    },
-  })
-  @ApiResponse(postulationNotFound)
-  @ApiResponse(accessOnlyProfessional)
-  @ApiParam(postulationApiParam)
-  @ApiOperation({
-    summary: 'Eliminar postulación',
-    description: 'Elimina una postulación por su id',
-  })
-  @Delete(':id')
-  // @ApiBearerAuth()
-  // @Roles(Role.PROFESSIONAL)
-  // @UseGuards(GuardToken, guardRoles)
-  remove(@Param('id') id: string) {
-    return this.postulationsService.remove(id);
-  }
+  // @HttpCode(204)
+  // @ApiResponse({
+  //   status: 204,
+  //   description: 'Postulación eliminada',
+  //   schema: {
+  //     example: {
+  //       message: `Postulacion con id: ${exampleCreatedPostulation.id} eliminada`,
+  //     },
+  //   },
+  // })
+  // @ApiResponse(postulationNotFound)
+  // @ApiResponse(accessOnlyProfessional)
+  // @ApiParam(postulationApiParam)
+  // @ApiOperation({
+  //   summary: 'Eliminar postulación',
+  //   description: 'Elimina una postulación por su id',
+  // })
+  // @Delete(':id')
+  // // @ApiBearerAuth()
+  // // @Roles(Role.PROFESSIONAL)
+  // // @UseGuards(GuardToken, guardRoles)
+  // remove(@Param('id') id: string) {
+  //   return this.postulationsService.remove(id);
+  // }
 
+  @ApiBearerAuth()
+  @Roles(Role.CLIENT)
+  @UseGuards(GuardToken, guardRoles)
   @Put('close')
   closePostulationByClient(@Body() closePostulation: ClosePostulation) {
     return this.postulationsService.closePostulationByClient(closePostulation);
