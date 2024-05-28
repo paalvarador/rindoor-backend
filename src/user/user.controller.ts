@@ -70,7 +70,7 @@ export class UserController {
   //   const user = await this.userService.create(createUserDto);
   //   return user;
   // }
-
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(GuardToken, guardRoles)
   @Put('banned/:id')

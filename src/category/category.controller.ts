@@ -52,7 +52,6 @@ import { GuardToken } from 'src/guards/token.guard';
 @Controller('category')
 @ApiTags('Categorias')
 @ApiResponse(internalServerError)
-@ApiBearerAuth()
 @ApiUnauthorizedResponse()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -100,6 +99,7 @@ export class CategoryController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(GuardToken, guardRoles)
   create(
@@ -222,6 +222,7 @@ export class CategoryController {
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
   @ApiParam(categoryParamId)
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(GuardToken, guardRoles)
   update(
@@ -265,6 +266,7 @@ export class CategoryController {
     summary: 'Eliminar categoria',
     description: 'Endpoint para eliminar una categoria',
   })
+  @ApiBearerAuth()
   @Roles(Role.ADMIN)
   @UseGuards(GuardToken, guardRoles)
   @ApiParam(categoryParamId)
