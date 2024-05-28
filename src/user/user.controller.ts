@@ -38,6 +38,7 @@ import { guardRoles } from 'src/guards/role.guard';
 import { GuardToken2 } from 'src/guards/token2.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
 import { AddCategoryUserDto } from './dto/addCategoryUser.dto';
+import { IRoom } from 'src/shared/interfaces/chat.interface';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -228,4 +229,16 @@ export class UserController {
   //   const deletedUser = await this.userService.remove(id);
   //   return deletedUser;
   // }
+
+  @Get('api/rooms')
+  async getAllRooms(): Promise<IRoom[]> {
+    return await this.userService.getRooms();
+  }
+
+  @Get('api/rooms/:room')
+  async getRoom(@Param() params): Promise<IRoom> {
+    const rooms = await this.userService.getRooms();
+    const room = await this.userService.getRoomByName(params.room);
+    return rooms[room];
+  }
 }
