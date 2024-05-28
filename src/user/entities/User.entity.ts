@@ -1,10 +1,8 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   JoinTable,
   ManyToMany,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -33,26 +31,21 @@ export class User {
   @Column({ type: 'varchar', length: 10, nullable: false })
   phone: string;
 
-  @Column({
-    type: 'varchar',
-    nullable: false,
-  })
+  @Column({ type: 'varchar', nullable: false })
   country: string;
-  @Column({
-    type: 'varchar',
-    nullable: false,
-  })
+
+  @Column({ type: 'varchar', nullable: false })
   province: string;
 
-  // @Column({ type: 'numeric', nullable: false, default: 682 })
-  // city: number;
+  @Column({ type: 'varchar', nullable: false })
+  city: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   address: string;
 
-  @Column({ type: 'varchar' })
-  coords: string
-  
+  @Column({ type: 'varchar', nullable: true })
+  coords?: string;
+
   @Column({
     type: 'decimal',
     precision: 10,
@@ -68,13 +61,16 @@ export class User {
 
   @Column({
     type: 'enum',
-    enum: [Role.CLIENT, Role.PROFESSIONAL],
+    enum: Role,
     nullable: false,
   })
   role: Role;
 
-  @OneToMany(() => Job, (job) => job.user)
-  jobs: Job[];
+  @OneToMany(() => Job, (job) => job.professional)
+  jobsAsProfessional: Job[];
+
+  @OneToMany(() => Job, (job) => job.client)
+  jobsAsClient: Job[];
 
   @OneToMany(() => Postulation, (postulations) => postulations.user)
   postulations: Postulation[];

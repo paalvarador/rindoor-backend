@@ -7,9 +7,10 @@ import { Feedback } from './entities/feedback.entity';
 import { Job } from 'src/jobs/entities/job.entity';
 import { User } from 'src/user/entities/User.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Postulation } from 'src/postulations/entities/postulation.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Feedback, Job, User, Category])],
+  imports: [TypeOrmModule.forFeature([Feedback, Job, User, Category, Postulation])],
   controllers: [FeedbacksController],
   providers: [FeedbacksService, UserService],
 })

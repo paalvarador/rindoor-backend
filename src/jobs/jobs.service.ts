@@ -18,6 +18,10 @@ import { Cron } from '@nestjs/schedule';
 import { EmailService } from 'src/email/email.service';
 import { body } from 'src/utils/body';
 import { FinishJob } from './dto/finishJob.dto';
+import { geocode } from 'src/utils/coords';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
+import { JobFinishedEvent } from './JobFinishedEvent';
+import { generateJobFinished } from 'src/utils/bodyFinishedJob';
 
 @Injectable()
 export class JobsService {
@@ -28,17 +32,20 @@ export class JobsService {
     private categoryRepository: Repository<Category>,
     private fileUploadService: FileUpload,
     private emailService: EmailService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(createJobDto: CreateJobDto, file) {
     const foundUser = await this.userRepository.findOne({
       where: { id: createJobDto.userId },
     });
-    if (!foundUser) throw new NotFoundException('Usuario not found');
+    // if (!foundUser.subscriptionId)
+    //   throw new BadRequestException('Usuario no tiene una suscripcion activa');
+    if (!foundUser) throw new NotFoundException('Usuario no encontrado');
+    if (foundUser.isActive === false)
+      return { message: 'usuario baneado', user: foundUser };
     if (foundUser.role !== 'CLIENT')
       throw new UnauthorizedException('Accesso solo para los Clientes');
-    if (foundUser.isActive === false)
-      throw new UnauthorizedException('Usuario Baneado');
 
     const foundCategory = await this.categoryRepository.findOne({
       where: { id: createJobDto.categoryId },
@@ -56,111 +63,109 @@ export class JobsService {
       }
       imgUrl = imgUpload.url;
     }
+    const country = createJobDto.country;
+    const province = createJobDto.province;
+    const city = createJobDto.city;
+    const address = createJobDto.address;
+
+    const coords = await geocode(country, province, city, address);
 
     const newJob = {
       ...createJobDto,
       category: foundCategory,
-      user: foundUser,
+      client: foundUser,
       img: imgUrl,
+      coords: coords,
     };
     return await this.jobRepository.save(newJob);
   }
 
   async findAll(filter?: filterJobCategory) {
-    const { page, limit, categories, minPrice, maxPrice } = filter;
+    const {
+      page,
+      limit,
+      categories,
+      minPrice,
+      maxPrice,
+      name,
+      latest,
+      prices,
+    } = filter || {};
     const defaultPage = page || 1;
     const defaultLimit = limit || 10;
     let defaultCategories = categories || [];
 
-    if (Array.isArray(categories)) {
+    if (typeof categories === 'string') {
+      defaultCategories = [categories];
+    } else if (Array.isArray(categories)) {
       defaultCategories = categories;
-    } else if (categories) {
-      if (typeof categories === 'string') {
-        defaultCategories = [categories];
-      } else if (categories) {
-        defaultCategories = [categories];
-      }
     }
 
     defaultCategories = defaultCategories.map((category) =>
       category.trim().toLowerCase().normalize(),
     );
 
-    const defaultMinPrice = minPrice || 0;
-    const defaultMaxPrice = maxPrice || 999999999.99;
+    const defaultMinPrice = minPrice ?? 0;
+    const defaultMaxPrice = maxPrice ?? 999999999.99;
 
     const startIndex = (defaultPage - 1) * defaultLimit;
     const endIndex = startIndex + defaultLimit;
 
     const jobs = await this.jobRepository.find({
-      relations: { category: true, user: true },
+      relations: { category: true },
     });
 
-    const filterJobs = jobs.filter(
+    let filterJobs = jobs.filter(
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
 
-    const filterCategories = categories
-      ? filterJobs.filter((job) =>
-          defaultCategories.includes(
-            job.category.name.toLowerCase().trim().normalize(),
-          ),
-        )
-      : filterJobs;
-    const sliceJobs = filterCategories.slice(startIndex, endIndex);
-    return sliceJobs;
-    // const countryJobs = !filter.country
-    //   ? sliceJobs
-    //   : sliceJobs.filter((job) => job.user.country === filter.country);
+    if (defaultCategories.length > 0) {
+      filterJobs = filterJobs.filter((job) =>
+        defaultCategories.includes(
+          job.category.name.toLowerCase().trim().normalize(),
+        ),
+      );
+    }
 
-    // const stateJobs = !filter.province
-    //   ? countryJobs
-    //   : countryJobs.filter((job) => job.user.province === filter.province);
-    // const cityJobs = !filter.city
-    //   ? stateJobs
-    //   : stateJobs.filter((job) => job.user.city === filter.city);
+    const parsedName =
+      name !== undefined ? Number.parseInt(name.toString()) : undefined;
+    const parsedLatest =
+      latest !== undefined ? Number.parseInt(latest.toString()) : undefined;
+    const parsedPrices =
+      prices !== undefined ? Number.parseInt(prices.toString()) : undefined;
 
-    // filter.name = filter.name && Number.parseInt(filter.name.toString());
-    // const sortedJobsByName =
-    //   filter.province === undefined
-    //     ? cityJobs
-    //     : filter.name === 0
-    //       ? cityJobs.sort((a, b) => {
-    //           const nameA = a.name.toUpperCase();
-    //           const nameB = b.name.toUpperCase();
-    //           return nameA < nameB ? -1 : nameA > nameB ? 1 : 0;
-    //         })
-    //       : cityJobs.sort((a, b) => {
-    //           const nameA = a.name.toUpperCase();
-    //           const nameB = b.name.toUpperCase();
-    //           return nameB < nameA ? -1 : nameB > nameA ? 1 : 0;
-    //         });
+    filterJobs = filterJobs.sort((a, b) => {
+      if (parsedName !== undefined) {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        const comparison = nameA.localeCompare(nameB);
+        if (comparison !== 0) {
+          return parsedName === 0 ? comparison : -comparison;
+        }
+      }
 
-    // filter.latest = filter.latest && Number.parseInt(filter.latest.toString());
-    // const sortedJobsByDate =
-    //   filter.latest === undefined
-    //     ? sortedJobsByName
-    //     : filter.latest === 0
-    //       ? sortedJobsByName.sort((a, b) => {
-    //           const dateA = new Date(a.created_at).getTime();
-    //           const dateB = new Date(b.created_at).getTime();
-    //           return dateA - dateB;
-    //         })
-    //       : sortedJobsByName.sort((a, b) => {
-    //           const dateA = new Date(a.created_at).getTime();
-    //           const dateB = new Date(b.created_at).getTime();
-    //           return dateB - dateA;
-    //         });
-    // filter.prices = filter.prices && Number.parseInt(filter.prices.toString());
-    // const sortedJobsByPrice =
-    //   filter.prices === undefined
-    //     ? sortedJobsByDate
-    //     : filter.prices === 0
-    //       ? sortedJobsByDate.sort((a, b) => a.base_price - b.base_price)
-    //       : sortedJobsByDate.sort((a, b) => b.base_price - a.base_price);
+      if (parsedLatest !== undefined) {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        const comparison = dateA - dateB;
+        if (comparison !== 0) {
+          return parsedLatest === 0 ? comparison : -comparison;
+        }
+      }
 
-    // return sortedJobsByPrice;
+      if (parsedPrices !== undefined) {
+        const comparison = a.base_price - b.base_price;
+        if (comparison !== 0) {
+          return parsedPrices === 0 ? comparison : -comparison;
+        }
+      }
+
+      return 0;
+    });
+
+    const paginatedJobs = filterJobs.slice(startIndex, endIndex);
+    return paginatedJobs;
   }
 
   async findJobByClient(clientId: string) {
@@ -168,7 +173,7 @@ export class JobsService {
       relations: { category: true },
     });
 
-    const filterByUser = findJob.filter((job) => job.user.id === clientId);
+    const filterByUser = findJob.filter((job) => job.client.id === clientId);
     if (!filterByUser)
       throw new NotFoundException('User does not have any jobs associated');
 
@@ -179,21 +184,39 @@ export class JobsService {
   async finishJob(finishJob: FinishJob) {
     const findJob = await this.jobRepository.findOne({
       where: { id: finishJob.jobId },
-      relations: ['postulations', 'postulations.user'],
+      relations: ['postulations', 'postulations.user', 'professional'],
     });
-    if (!findJob) throw new NotFoundException('Job does not exist');
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    if (findJob.status === JobStatus.Finished)
+      throw new BadRequestException('El trabajo ya ha sido finalizado');
+    if (findJob.status !== JobStatus.InProgress)
+      throw new BadRequestException(
+        'No se puede finalizar un trabajo no iniciado',
+      );
+
+    if (findJob.professional.id !== finishJob.userId)
+      throw new UnauthorizedException(
+        'Solo el profesional encargado puede finalizar',
+      );
 
     const findFinishJob = findJob.postulations.find(
       (p) => p.user.id === finishJob.userId,
     );
+
     if (!findFinishJob)
       throw new NotFoundException(
-        'Job does not have relationship with userProfessional',
+        'Trabajo no encontrado para este profesional',
       );
 
     await this.jobRepository.update(
       { id: findJob.id },
       { status: JobStatus.Finished },
+    );
+
+    this.eventEmitter.emit(
+      'job.finished',
+      new JobFinishedEvent(finishJob.jobId),
     );
 
     return 'Job finished successfully by professional';
@@ -204,7 +227,7 @@ export class JobsService {
       where: { id: id },
       relations: [
         'category',
-        'user',
+        'client',
         'postulations',
         'postulations.user',
         'postulations.user.categories',
@@ -215,14 +238,27 @@ export class JobsService {
     return findJob;
   }
 
+  async banJob(jobId: string) {
+    const findJob = await this.jobRepository.findOne({ where: { id: jobId } });
+
+    if (!findJob) throw new NotFoundException('Trabajo no encontrado');
+
+    await this.jobRepository.update({ id: jobId }, { banned: true });
+
+    const updatedJob = await this.jobRepository.findOne({
+      where: { id: findJob.id },
+    });
+    return updatedJob;
+  }
+
   async remove(id: string) {
     const findJob = await this.jobRepository.findOne({
       where: { id: id },
-      relations: { user: true },
+      relations: { client: true },
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
-    if (findJob.user.role !== 'CLIENT')
+    if (findJob.client.id !== 'CLIENT')
       throw new BadRequestException('Action just for Clients');
 
     await this.jobRepository.remove(findJob);
@@ -233,7 +269,7 @@ export class JobsService {
   @Cron('0 8 * * 1-5')
   async handleCron() {
     const jobs = await this.jobRepository.find({
-      relations: ['user', 'category'],
+      relations: ['professional', 'category'],
     });
     const users = await this.userRepository.find({
       relations: { categories: true },
@@ -277,5 +313,34 @@ export class JobsService {
 
       this.emailService.sendPostulation(mail);
     });
+  }
+
+  @OnEvent('job.finished')
+  private async sendEmail(payload: JobFinishedEvent) {
+    const jobId = Object.values(payload)[0];
+
+    const findJobById = await this.jobRepository.findOne({
+      where: {
+        id: jobId,
+      },
+      relations: ['client', 'professional'],
+    });
+
+    const userClientEmail = findJobById.client.email;
+
+    const template = generateJobFinished(
+      userClientEmail,
+      findJobById,
+      findJobById.professional.name,
+    );
+
+    const mail = {
+      to: userClientEmail,
+      subject: 'Trabajo Finalizado',
+      text: '',
+      template: template,
+    };
+
+    await this.emailService.sendPostulation(mail);
   }
 }

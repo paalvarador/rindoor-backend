@@ -39,7 +39,6 @@ import { FeedbacksModule } from './feedbacks/feedbacks.module';
       secret: process.env.JWT_SECRET,
     }),
     AuthModule,
-
     EmailModule,
     SubscriptionsModule.forRootAsync(),
     ChatModule,

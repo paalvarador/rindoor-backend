@@ -104,40 +104,57 @@ export class SubscriptionsService {
   }
 
   async getAllSubscriptions() {
-    const findSubscriptions = await this.stripe.subscriptions.list();
-
+    const findSubscriptions = await this.stripe.subscriptions.list({
+      status: 'all',
+    });
     const subscriptions = await Promise.all(
       findSubscriptions.data.map(async (s) => {
         const customer = await this.stripe.customers.retrieve(
           s.customer as string,
         );
 
+        const userDB = await this.userService.findByCustomerIdStripe(
+          s.customer as string,
+        );
+
+        if (!userDB) {
+          return null;
+        }
+
+        const userToReturn = {
+          name: userDB.name,
+          email: userDB.email,
+          id: userDB.id,
+          phone: userDB.phone,
+          role: userDB.role,
+        };
+
         const planItems = s.items.data.map((item) => ({
-          id: item.plan.id,
           interval: item.plan.interval,
           currency: item.plan.currency,
           price: item.plan.interval === 'month' ? '5' : '50',
         }));
+
         return {
           id: s.id,
           createdAt: new Date(s.created * 1000),
           current_period_end: new Date(s.current_period_end * 1000),
           current_period_start: new Date(s.current_period_start * 1000),
           status: s.status,
-          customer: {
-            id: customer.id,
-            email: (customer as Stripe.Customer).email,
-          },
           plan: planItems,
+          user: userToReturn,
         };
       }),
     );
+    const filteredSubscriptions = subscriptions.filter((s) => s !== null);
 
-    return subscriptions;
+    return filteredSubscriptions;
   }
 
   async getSubscription(subscriptionId: string) {
-    const subscriptions = await this.stripe.subscriptions.list();
+    const subscriptions = await this.stripe.subscriptions.list({
+      status: 'all',
+    });
     const subscription = subscriptions.data.find((sub) => {
       return sub.id === subscriptionId;
     });

@@ -92,6 +92,14 @@ export class CreateUserDto {
   // city: string;
 
   /**
+   * @example Buenos Aires
+   * @description nombre de la ciudad del usuario
+   */
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  /**
    * @example 'Calle 12B # 12-12'
    * @description Address of the user
    */
@@ -114,10 +122,7 @@ export class CreateUserDto {
    * @description Categorias del usuario
    */
   @IsOptional()
-  @ValidateNested({ each: true })
-  @IsObject({ each: true })
   @IsArray()
-  @IsInstance(CategoryId, { each: true })
   @Type(() => CategoryId)
   @IsDefined({ each: true })
   categories: CategoryId[];

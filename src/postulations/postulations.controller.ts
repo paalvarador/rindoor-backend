@@ -21,6 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import {
+  accessOnlyProfessional,
   exampleCreatedPostulation,
   postulationApiParam,
   postulationJobUserNotFound,
@@ -39,17 +40,6 @@ import { ClosePostulation } from './dto/closePostulation.dto';
 @Controller('postulations')
 @ApiTags('Postulaciones')
 @ApiResponse(internalServerError)
-@ApiResponse({
-  status: 401,
-  description: 'Acceso solo para los Profesionales',
-  schema: {
-    example: {
-      message: 'Acesso solo para los Profesionales',
-      error: 'Unauthorized',
-      statusCode: 401,
-    },
-  },
-})
 export class PostulationsController {
   constructor(private readonly postulationsService: PostulationsService) {}
 
@@ -74,6 +64,7 @@ export class PostulationsController {
       example: postulationValidationsErrors,
     },
   })
+  @ApiResponse(accessOnlyProfessional)
   @ApiOperation({
     summary: 'Crear postulación',
     description: 'Crea una postulación a un trabajo',
@@ -115,6 +106,7 @@ export class PostulationsController {
     summary: 'Buscar postulación',
     description: 'Busca una postulación por su id',
   })
+  @ApiResponse(accessOnlyProfessional)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.postulationsService.findOne(id);
@@ -131,6 +123,7 @@ export class PostulationsController {
     },
   })
   @ApiResponse(postulationNotFound)
+  @ApiResponse(accessOnlyProfessional)
   @ApiParam(postulationApiParam)
   @ApiOperation({
     summary: 'Eliminar postulación',
@@ -144,8 +137,8 @@ export class PostulationsController {
     return this.postulationsService.remove(id);
   }
 
-  @Put('cancel')
-  cancelPostulationByClient(@Body() closePostulation: ClosePostulation) {
-    return this.postulationsService.cancelPostulationByClient(closePostulation);
+  @Put('close')
+  closePostulationByClient(@Body() closePostulation: ClosePostulation) {
+    return this.postulationsService.closePostulationByClient(closePostulation);
   }
 }

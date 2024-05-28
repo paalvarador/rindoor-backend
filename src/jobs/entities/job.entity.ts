@@ -26,6 +26,9 @@ export class Job {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuid();
 
+  @Column({ type: 'boolean', default: false })
+  banned: boolean;
+
   @Column({ type: 'varchar', length: 50, nullable: false })
   name: string;
 
@@ -47,14 +50,22 @@ export class Job {
   @Column({ default: JobStatus.Active })
   status: string;
 
-  @Column({
-    type: 'varchar',
-  })
-  coords: string;
+  @Column({ type: 'varchar', nullable: false })
+  country: string;
 
-  @Column({
-    type: 'varchar',
-  })
+  @Column({ type: 'varchar', nullable: false })
+  province: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  city: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: false })
+  address: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  coords?: string;
+
+  @Column({ type: 'varchar', nullable: true })
   img: string;
 
   @CreateDateColumn()
@@ -66,11 +77,16 @@ export class Job {
   category: Category;
 
   @Index({ unique: false })
-  @ManyToOne(() => User, (user) => user.jobs)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ManyToOne(() => User, (user) => user.jobsAsProfessional)
+  @JoinColumn({ name: 'professional_id' })
+  professional: User;
 
-  @OneToMany(() => Feedback, (feeback) => feeback.job)
+  @Index({ unique: false })
+  @ManyToOne(() => User, (user) => user.jobsAsClient)
+  @JoinColumn({ name: 'client_id' })
+  client: User;
+
+  @OneToMany(() => Feedback, (feedback) => feedback.job)
   feedback: Feedback[];
 
   @OneToMany(() => Postulation, (postulations) => postulations.job)

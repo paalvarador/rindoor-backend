@@ -71,6 +71,11 @@ export class UserController {
     return user;
   }
 
+  @Put('banned/:id')
+  async banUser(@Param('id', ParseUUIDPipe) id: string) {
+    return await this.userService.banUser(id);
+  }
+
   @ApiResponse({
     status: 200,
     description: 'Listar todos los usuarios exitosamente',
@@ -194,36 +199,36 @@ export class UserController {
     return updatedUser;
   }
 
-  @Delete('/:id')
-  // @Roles(Role.CLIENT, Role.PROFESSIONAL)
-  // @UseGuards(GuardToken2, guardRoles)
-  //@ApiUnauthorizedResponse()
-  //@ApiBearerAuth()
-  @ApiResponse({
-    status: 204,
-    description: 'Usuario eliminado',
-  })
-  @ApiResponse(userAlreadyExists)
-  @ApiResponse({
-    status: 404,
-    description: 'Usuario no encontrado',
-    schema: {
-      example: {
-        message: 'Usuario no encontrado',
-        error: 'Not Found',
-        statusCode: 404,
-      },
-    },
-  })
-  @ApiOperation({
-    summary: 'Eliminar un usuario',
-    description: 'Elimina un usuario de la base de datos',
-  })
-  @HttpCode(204)
-  async remove(@Param('id') id: string): Promise<string> {
-    const deletedUser = await this.userService.remove(id);
-    return deletedUser;
-  }
+  // @Put('/:id')
+  // // @Roles(Role.CLIENT, Role.PROFESSIONAL)
+  // // @UseGuards(GuardToken2, guardRoles)
+  // //@ApiUnauthorizedResponse()
+  // //@ApiBearerAuth()
+  // @ApiResponse({
+  //   status: 204,
+  //   description: 'Usuario eliminado',
+  // })
+  // @ApiResponse(userAlreadyExists)
+  // @ApiResponse({
+  //   status: 404,
+  //   description: 'Usuario no encontrado',
+  //   schema: {
+  //     example: {
+  //       message: 'Usuario no encontrado',
+  //       error: 'Not Found',
+  //       statusCode: 404,
+  //     },
+  //   },
+  // })
+  // @ApiOperation({
+  //   summary: 'Eliminar un usuario',
+  //   description: 'Elimina un usuario de la base de datos',
+  // })
+  // @HttpCode(204)
+  // async remove(@Param('id') id: string): Promise<string> {
+  //   const deletedUser = await this.userService.remove(id);
+  //   return deletedUser;
+  // }
 
   @Get('api/rooms')
   async getAllRooms(): Promise<IRoom[]> {

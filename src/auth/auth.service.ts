@@ -20,6 +20,7 @@ import {
   findCountryName,
   findState,
 } from 'src/ubication/utils/fsUtil.util';
+import { Role } from 'src/user/entities/Role.enum';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('Usuario no encontrado');
     if (user.isActive === false)
-      throw new UnauthorizedException('Usuario Baneado');
+      return { message: 'usuario baneado', user: user };
     // const userCountryName = await findCountryName(user.country);
     // const userState = await findState(user.province);
     // const userCity = await findCity(user.city);
@@ -56,6 +57,12 @@ export class AuthService {
       address: user.address,
       rating: user.rating,
     };
+    if (user.role === Role.CLIENT) {
+      userPayload['jobs'] = JSON.stringify(user.jobsAsClient);
+    }
+    if (user.role === Role.PROFESSIONAL) {
+      userPayload['postulations'] = JSON.stringify(user.postulations);
+    }
 
     const token = this.jwtService.sign(userPayload);
 
@@ -66,7 +73,7 @@ export class AuthService {
 
   async signUp(createUserDto: CreateUserDto) {
     const { email } = createUserDto;
-    const user = await this.userService.findByEmail(email);
+    const user = await this.userRepository.findOneBy({ email: email });
 
     if (user) throw new BadRequestException('Usuario ya existe');
 

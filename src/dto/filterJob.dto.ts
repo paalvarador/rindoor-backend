@@ -21,7 +21,7 @@ export class filterJobCategory extends PaginationQuery {
   })
   @IsString({ each: true })
   @IsOptional()
-  categories: string[];
+  categories?: string[];
 
   /**
    * @example 0.00
@@ -43,47 +43,47 @@ export class filterJobCategory extends PaginationQuery {
   @Transform(({ value }) => Number(value))
   maxPrice?: number;
 
-  /**
-   * @example 11
-   * @description Pais del usuario
-   */
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidCountry({
-    message: 'Pais invalido',
-  })
-  @Transform(({ value }) => Number(value))
-  country: number;
+  // /**
+  //  * @example 11
+  //  * @description Pais del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidCountry({
+  //   message: 'Pais invalido',
+  // })
+  // @Transform(({ value }) => Number(value))
+  // country: number;
 
-  /**
-   * @example 3656
-   * @description id de la provincia del usuario
-   */
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidProvince('country', {
-    message: 'Provincia invalida',
-  })
-  @Transform(({ value }) => Number(value))
-  province: number;
+  // /**
+  //  * @example 3656
+  //  * @description id de la provincia del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidProvince('country', {
+  //   message: 'Provincia invalida',
+  // })
+  // @Transform(({ value }) => Number(value))
+  // province: number;
 
-  /**
-   * @example 682
-   * @description Id de la ciudad del usuario
-   */
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  @Max(99999)
-  @IsValidCity('country', 'province', {
-    message: 'Ciudad invalida',
-  })
-  @Transform(({ value }) => Number(value))
-  city: number;
+  // /**
+  //  * @example 682
+  //  * @description Id de la ciudad del usuario
+  //  */
+  // @IsOptional()
+  // @IsNumber()
+  // @Min(1)
+  // @Max(99999)
+  // @IsValidCity('country', 'province', {
+  //   message: 'Ciudad invalida',
+  // })
+  // @Transform(({ value }) => Number(value))
+  // city: number;
 
   /**
    * @example 1
@@ -94,7 +94,7 @@ export class filterJobCategory extends PaginationQuery {
   @Min(0)
   @Max(1)
   @Transform(({ value }) => Number(value))
-  name: number;
+  name?: number;
 
   /**
    * @example 1
@@ -105,7 +105,7 @@ export class filterJobCategory extends PaginationQuery {
   @Min(0)
   @Max(1)
   @Transform(({ value }) => Number(value))
-  prices: number;
+  prices?: number;
 
   /**
    * @example 1
@@ -116,5 +116,5 @@ export class filterJobCategory extends PaginationQuery {
   @Min(0)
   @Max(1)
   @Transform(({ value }) => Number(value))
-  latest: number;
+  latest?: number;
 }
