@@ -179,6 +179,9 @@ export class JobsController {
     return this.jobsService.finishJob(finishJob);
   }
 
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   @Put('banned/:id')
   banJob(@Param('id', ParseUUIDPipe) jobId: string) {
     return this.jobsService.banJob(jobId);
