@@ -47,11 +47,12 @@ import { GuardToken2 } from 'src/guards/token2.guard';
 import { guardRoles } from 'src/guards/role.guard';
 import { Role } from 'src/user/entities/Role.enum';
 import { Roles } from 'src/decorators/role.decorator';
+import { GuardToken } from 'src/guards/token.guard';
 
 @Controller('category')
 @ApiTags('Categorias')
 @ApiResponse(internalServerError)
-// @ApiBearerAuth()
+@ApiBearerAuth()
 @ApiUnauthorizedResponse()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -99,8 +100,8 @@ export class CategoryController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
-  // @Roles(Role.ADMIN)
-  // @UseGuards(GuardToken2, guardRoles)
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   create(
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile(
