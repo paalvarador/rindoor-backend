@@ -13,7 +13,7 @@ async function bootstrap() {
       'Rindoor es una plataforma que te permite encontrar a los mejores profesionales para solucionar los problemas de tu hogar.',
     )
     .setVersion('1.0')
-    //.addBearerAuth()
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, configSwagger);
   SwaggerModule.setup('api', app, document);
