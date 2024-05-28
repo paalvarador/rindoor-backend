@@ -38,6 +38,7 @@ import { guardRoles } from 'src/guards/role.guard';
 import { GuardToken2 } from 'src/guards/token2.guard';
 import { internalServerError } from 'src/utils/swagger.utils';
 import { AddCategoryUserDto } from './dto/addCategoryUser.dto';
+import { AddContactDto } from './dto/addContact.dto';
 
 @Controller('users')
 @ApiTags('Usuarios')
@@ -45,30 +46,30 @@ import { AddCategoryUserDto } from './dto/addCategoryUser.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiResponse({
-    status: 201,
-    description: 'Usuario creado exitosamente',
-    schema: {
-      example: exampleCreatedUser,
-    },
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Validacion fallida',
-    schema: {
-      example: userValidationsErrors,
-    },
-  })
-  @ApiResponse(userAlreadyExists)
-  @ApiOperation({
-    summary: 'Crear un usuario',
-    description: 'Crea un usuario en la base de datos',
-  })
-  @Post()
-  async registerUser(@Body() createUserDto: CreateUserDto): Promise<User> {
-    const user = await this.userService.create(createUserDto);
-    return user;
-  }
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Usuario creado exitosamente',
+  //   schema: {
+  //     example: exampleCreatedUser,
+  //   },
+  // })
+  // @ApiResponse({
+  //   status: 400,
+  //   description: 'Validacion fallida',
+  //   schema: {
+  //     example: userValidationsErrors,
+  //   },
+  // })
+  // @ApiResponse(userAlreadyExists)
+  // @ApiOperation({
+  //   summary: 'Crear un usuario',
+  //   description: 'Crea un usuario en la base de datos',
+  // })
+  // @Post()
+  // async registerUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  //   const user = await this.userService.create(createUserDto);
+  //   return user;
+  // }
 
   @Put('banned/:id')
   async banUser(@Param('id', ParseUUIDPipe) id: string) {
@@ -196,6 +197,16 @@ export class UserController {
   ): Promise<string> {
     const updatedUser = await this.userService.update(id, updateUserDto);
     return updatedUser;
+  }
+
+  @Post()
+  @ApiOperation({
+    summary: 'Agregar un contacto a un usuario',
+    description: 'Agrega un contacto a un usuario en la base de datos',
+  })
+  async addContact(@Body() addContact: AddContactDto) {
+    const { idUser, idContact } = addContact;
+    return this.userService.addContact(idUser, idContact);
   }
 
   // @Put('/:id')
