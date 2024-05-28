@@ -71,6 +71,8 @@ export class UserController {
   //   return user;
   // }
 
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   @Put('banned/:id')
   async banUser(@Param('id', ParseUUIDPipe) id: string) {
     return await this.userService.banUser(id);
