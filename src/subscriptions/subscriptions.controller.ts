@@ -7,10 +7,12 @@ import {
   Patch,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubDto } from './dto/CreateSub.dto';
 import {
+  ApiBearerAuth,
   ApiInternalServerErrorResponse,
   ApiOperation,
   ApiParam,
@@ -25,6 +27,10 @@ import {
   exampleUserOrPlanNotFound,
   exampleUserSubscriptions,
 } from './swaggerExample/swagger.util';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from 'src/user/entities/Role.enum';
+import { GuardToken } from 'src/guards/token.guard';
+import { guardRoles } from 'src/guards/role.guard';
 
 @Controller('subscriptions')
 @ApiTags('Subscripciones')
@@ -32,6 +38,9 @@ import {
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
+  @ApiBearerAuth()
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   @Get()
   async getAllSubscriptions() {
     return await this.subscriptionsService.getAllSubscriptions();
@@ -53,6 +62,9 @@ export class SubscriptionsController {
     return this.subscriptionsService.getPlans();
   }
 
+  @ApiBearerAuth()
+  @Roles(Role.PROFESSIONAL)
+  @UseGuards(GuardToken, guardRoles)
   @Post()
   @ApiResponse({
     status: 201,
