@@ -9,6 +9,7 @@ import {
   HttpCode,
   UseGuards,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostulationsService } from './postulations.service';
 import { CreatePostulationDto } from './dto/create-postulation.dto';
@@ -36,6 +37,7 @@ import { internalServerError } from 'src/utils/swagger.utils';
 import e from 'express';
 import { error } from 'console';
 import { ClosePostulation } from './dto/closePostulation.dto';
+import { modifyPostulation } from 'src/interceptor/modifyPostulation.interceptor';
 
 @Controller('postulations')
 @ApiTags('Postulaciones')
@@ -73,6 +75,7 @@ export class PostulationsController {
   // @Roles(Role.PROFESSIONAL)
   // @UseGuards(GuardToken, guardRoles)
   @Post()
+  @UseInterceptors(modifyPostulation)
   create(@Body() createPostulationDto: CreatePostulationDto) {
     return this.postulationsService.create(createPostulationDto);
   }
