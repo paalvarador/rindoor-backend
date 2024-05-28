@@ -46,17 +46,17 @@ export class PostulationsService {
     if (findUser.role !== 'PROFESSIONAL')
       throw new BadRequestException('Acesso solo para los Profesionales');
 
-    if (findUser.subscriptionId === null)
-      return {
-        message: 'Profesional no tiene suscripcion',
-        user: {
-          id: findUser.id,
-          name: findUser.name,
-          role: findUser.role,
-          email: findUser.email,
-          suscription: findUser.subscriptionId,
-        },
-      };
+    // if (findUser.subscriptionId === null)
+    //   return {
+    //     message: 'Profesional no tiene suscripcion',
+    //     user: {
+    //       id: findUser.id,
+    //       name: findUser.name,
+    //       role: findUser.role,
+    //       email: findUser.email,
+    //       suscription: findUser.subscriptionId,
+    //     },
+    //   };
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
