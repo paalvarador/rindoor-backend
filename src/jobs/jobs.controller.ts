@@ -109,10 +109,10 @@ export class JobsController {
   @ApiBody({
     ...jobApiBody,
   })
-  //@ApiBearerAuth()
   @Post()
-  // @Roles(Role.CLIENT)
-  // @UseGuards(GuardToken, guardRoles)
+  @ApiBearerAuth()
+  @Roles(Role.CLIENT)
+  @UseGuards(GuardToken, guardRoles)
   @UseInterceptors(modifyJob)
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
@@ -174,6 +174,9 @@ export class JobsController {
     return this.jobsService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @Roles(Role.PROFESSIONAL)
+  @UseGuards(GuardToken, guardRoles)
   @Put('finish')
   finishJob(@Body() finishJob: FinishJob) {
     return this.jobsService.finishJob(finishJob);
@@ -187,25 +190,25 @@ export class JobsController {
     return this.jobsService.banJob(jobId);
   }
 
-  @HttpCode(204)
-  @ApiResponse({
-    status: 204,
-    description: 'Trabajo eliminado',
-    schema: {
-      example: 'Trabajo con id: 5e9d7f4d-7b1f-4d6c-8e0d-4b7e6f7b1b4d eliminado',
-    },
-  })
-  @ApiResponse(jobNotFound)
-  @ApiParam(jobParamId)
-  @ApiOperation({
-    summary: 'Eliminar un Trabajo por ID',
-    description: 'Endpoint para eliminar un Trabajo por ID',
-  })
+  // @HttpCode(204)
+  // @ApiResponse({
+  //   status: 204,
+  //   description: 'Trabajo eliminado',
+  //   schema: {
+  //     example: 'Trabajo con id: 5e9d7f4d-7b1f-4d6c-8e0d-4b7e6f7b1b4d eliminado',
+  //   },
+  // })
+  // @ApiResponse(jobNotFound)
+  // @ApiParam(jobParamId)
+  // @ApiOperation({
+  //   summary: 'Eliminar un Trabajo por ID',
+  //   description: 'Endpoint para eliminar un Trabajo por ID',
+  // })
   //  @ApiBearerAuth()
   // @Roles(Role.CLIENT)
   // @UseGuards(GuardToken, guardRoles)
-  @Delete(':id')
-  remove(@Param('id', ParseUUIDPipe) id: string) {
-    return this.jobsService.remove(id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id', ParseUUIDPipe) id: string) {
+  //   return this.jobsService.remove(id);
+  // }
 }
