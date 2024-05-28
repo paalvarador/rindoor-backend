@@ -222,8 +222,8 @@ export class CategoryController {
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(minSizeFile)
   @ApiParam(categoryParamId)
-  //@Roles(Role.ADMIN)
-  // @UseGuards(GuardToken2, guardRoles)
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -265,8 +265,8 @@ export class CategoryController {
     summary: 'Eliminar categoria',
     description: 'Endpoint para eliminar una categoria',
   })
-  //@Roles(Role.ADMIN)
-  //@UseGuards(GuardToken2, guardRoles)
+  @Roles(Role.ADMIN)
+  @UseGuards(GuardToken, guardRoles)
   @ApiParam(categoryParamId)
   @Delete(':id')
   remove(@Param('id') id: string) {
