@@ -1,3 +1,4 @@
+import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { User } from 'src/user/entities/User.entity';
 import {
   Column,
@@ -21,9 +22,10 @@ export class Chat {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.clientChats)
-  client: User;
+  @ManyToOne(() => User, (user) => user.chats)
+  from: User;
 
-  @ManyToOne(() => User, (user) => user.professionalChats)
-  professional: User;
+  @ManyToOne(() => User, (user) => user.chats)
+  to: User;
+
 }

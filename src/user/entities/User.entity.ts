@@ -22,6 +22,9 @@ export class User {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
+  @Column({ type: 'boolean', default: false })
+  banned: boolean;
+
   @Column({ type: 'varchar', length: 200, nullable: false })
   name: string;
 
@@ -79,11 +82,8 @@ export class User {
   @JoinTable()
   categories: Category[];
 
-  @OneToMany(() => Chat, (chat) => chat.client)
-  clientChats: Chat[];
-
-  @OneToMany(() => Chat, (chat) => chat.professional)
-  professionalChats: Chat[];
+  @OneToMany(() => Chat, (chat) => chat.from)
+  chats: Chat[];
 
   @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;

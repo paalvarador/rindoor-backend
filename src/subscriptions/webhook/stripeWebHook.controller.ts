@@ -1,8 +1,10 @@
 import { Body, Controller, Inject, Post } from '@nestjs/common';
 import Stripe from 'stripe';
 import { SubscriptionsService } from '../subscriptions.service';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 @Controller('stripe/webhook')
+@ApiExcludeController()
 export class StripeWebHookController {
   private readonly stripe: Stripe;
   constructor(
