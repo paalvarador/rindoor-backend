@@ -2,7 +2,6 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsService } from './subscriptions.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserService } from 'src/user/user.service';
 import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/User.entity';
@@ -20,7 +19,7 @@ export class SubscriptionsModule {
       imports: [
         ConfigModule.forRoot(),
         UserModule,
-        TypeOrmModule.forFeature([User,Category, Postulation, Job]),
+        TypeOrmModule.forFeature([User, Category, Postulation, Job]),
       ],
       providers: [
         SubscriptionsService,
@@ -30,7 +29,6 @@ export class SubscriptionsModule {
             configService.get('STRIPE_API_KEY'),
           inject: [ConfigService],
         },
-        UserService,
       ],
     };
   }

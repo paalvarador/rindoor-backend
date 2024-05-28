@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { IRoom, IUser } from 'src/shared/interfaces/chat.interface';
 import { geocode } from 'src/utils/coords';
 import { Postulation } from 'src/postulations/entities/postulation.entity';
 import { Job } from 'src/jobs/entities/job.entity';
+import { ROOMS } from './constants';
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,7 @@ export class UserService {
     private userRepository: Repository<User>,
     @InjectRepository(Category)
     private categoryRepository: Repository<Category>,
+    @Inject(ROOMS)
     private rooms: IRoom[],
     @InjectRepository(Postulation)
     private postulationRepository: Repository<Postulation>,
