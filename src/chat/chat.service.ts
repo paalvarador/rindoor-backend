@@ -53,6 +53,7 @@ export class ChatService {
       from: userFromExists,
       to: userToExists,
     });
+    console.log('********+PAYLOAD*************', chatMessage);
 
     return await this.chatRepository.save(chatMessage);
   }
@@ -85,23 +86,12 @@ export class ChatService {
   }
 
   async getConctacts(userFrom: string): Promise<User[]> {
-    const user = await this.userRepository.findOneBy({ id: userFrom });
-    if (!user) {
-      console.log('User does not exist');
-      return;
-    }
-
-    if (user.role === Role.CLIENT) {
-      return await this.userRepository.find({
-        where: { role: Role.PROFESSIONAL },
-      });
-    }
-
-    if (user.role === Role.PROFESSIONAL) {
-      const clients = await this.userRepository.find({
-        where: { role: Role.CLIENT },
-      });
-      return clients;
-    }
+    const user = await this.userRepository.findOne({
+      where: { id: userFrom },
+      relations: ['contacts'],
+    });
+    if (!user) return [];
+    if (!user.contacts) return [];
+    return user.contacts;
   }
 }

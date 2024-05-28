@@ -218,4 +218,40 @@ export class UserService {
     });
     return user;
   }
+
+  async addContact(id: string, contactId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['contacts'],
+    });
+    if (!user) throw new NotFoundException('Usuario no encontrado');
+
+    const contact = await this.userRepository.findOne({
+      where: { id: contactId },
+    });
+    if (!contact) throw new NotFoundException('Contacto no encontrado');
+
+    if (user.role === contact.role)
+      throw new BadRequestException(
+        'No puedes agregar un contacto con el mismo rol',
+      );
+
+    const contacts = user.contacts.map((contact) => contact.id);
+    if (!contacts.includes(contact.id)) {
+      user.contacts.push(contact);
+      await this.userRepository.save(user);
+    }
+
+    const userContact = await this.userRepository.findOne({
+      where: { id: contactId },
+      relations: ['contacts'],
+    });
+    const contactsContact = userContact.contacts.map((contact) => contact.id);
+    if (!contactsContact.includes(user.id)) {
+      userContact.contacts.push(user);
+      await this.userRepository.save(userContact);
+      return user;
+    }
+    return 'Usuario ya tiene este contacto';
+  }
 }

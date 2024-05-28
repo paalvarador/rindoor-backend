@@ -85,6 +85,10 @@ export class User {
   @OneToMany(() => Chat, (chat) => chat.from)
   chats: Chat[];
 
+  @ManyToMany(() => User)
+  @JoinTable()
+  contacts: User[];
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   planId: string;
 

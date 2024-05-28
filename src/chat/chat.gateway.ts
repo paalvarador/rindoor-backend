@@ -51,11 +51,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       payload.userTo,
       payload.message,
     );
-    console.log('********+PAYLOAD*************', payload);
-    this.server.emit(
-      `message_${payload.userFrom}_${payload.userTo}`,
-      newMessage,
-    );
+    // quiero un evento general para todos los mensajes
+    let messageEvent;
+    if (payload.userTo > payload.userFrom)
+      messageEvent = `chat_${payload.userFrom}_${payload.userTo}`;
+    else messageEvent = `chat_${payload.userTo}_${payload.userFrom}`;
+
+    this.server.emit(messageEvent, newMessage);
   }
 
   @SubscribeMessage('joinRoom')
