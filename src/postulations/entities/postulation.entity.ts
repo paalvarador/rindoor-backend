@@ -1,3 +1,4 @@
+import { Chat } from 'src/chat/entities/chat.entity';
 import { Job } from 'src/jobs/entities/job.entity';
 import { User } from 'src/user/entities/User.entity';
 import {
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -40,4 +42,6 @@ export class Postulation {
   @ManyToOne(() => Job, (job) => job.postulations)
   @JoinColumn({ name: 'job_id' })
   job: Job;
+
+  
 }

@@ -42,8 +42,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     payload: AddMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    this.logger.log(`user: ${payload.userFrom}`);
-    this.logger.log(`body: ${payload.userTo}`);
+    this.logger.log(`from: ${payload.userFrom}`);
+    this.logger.log(`to: ${payload.userTo}`);
     this.logger.log(`body: ${payload.message}`);
 
     const newMessage = await this.chatService.createMessage(
@@ -51,9 +51,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       payload.userTo,
       payload.message,
     );
+    console.log('********+PAYLOAD*************', payload);
     this.server.emit(
       `message_${payload.userFrom}_${payload.userTo}`,
       newMessage,
     );
+  }
+
+  @SubscribeMessage('joinRoom')
+  async handleJoinRoom(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.join(`${data.userFrom}_${data.userTo}`);
+    this.logger.log(`Client joined room: `, data);
+    const allMessages = await this.chatService.getMessagesForChat(
+      data.userFrom,
+      data.userTo,
+    );
+    client.emit('roomMessages', allMessages);
+  }
+
+  @SubscribeMessage('start')
+  async handleGetContacts(
+    @MessageBody() data: any,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const contacts = await this.chatService.getConctacts(data.userFrom);
+    client.emit(`contacts_${data.userFrom}`, contacts);
   }
 }
