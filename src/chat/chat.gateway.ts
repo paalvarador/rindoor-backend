@@ -11,12 +11,6 @@ import { ChatService } from './chat.service';
 import { AddMessageDto } from './dto/add-message.dto';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import {
-  IServerToClientEvents,
-  IClientToServerEvents,
-  IMessage,
-  IUser,
-} from '../shared/interfaces/chat.interface';
 import { UserService } from 'src/user/user.service';
 
 @WebSocketGateway({
@@ -30,10 +24,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private userService: UserService,
   ) {}
 
-  @WebSocketServer() server: Server = new Server<
-    IServerToClientEvents,
-    IClientToServerEvents
-  >();
+  @WebSocketServer() server: Server = new Server();
 
   private logger = new Logger('ChatGateway');
 
@@ -42,38 +33,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(socket: Socket): Promise<void> {
-    await this.userService.removeUserFromAllRooms(socket.id);
     this.logger.log(`Socket disconnected: ${socket.id}`);
   }
 
-  @SubscribeMessage('chat')
-  async handleChatEvent(
-    @MessageBody()
-    payload: IMessage,
-  ): Promise<IMessage> {
-    this.logger.log(payload);
-    this.server.to(payload.roomName).emit('chat', payload); // broadcast messages
-    return payload;
-  }
-
-  @SubscribeMessage('join_room')
-  async handleSetClientDataEvent(
-    @MessageBody()
-    payload: {
-      roomName: string;
-      user: IUser;
-    },
-  ) {
-    if (payload.user.socketId) {
-      this.logger.log(
-        `${payload.user.socketId} is joining ${payload.roomName}`,
-      );
-      await this.server.in(payload.user.socketId).socketsJoin(payload.roomName);
-      await this.userService.addUserToRoom(payload.roomName, payload.user);
-    }
-  }
-
-  /*
   @SubscribeMessage('chat')
   async handleMessage(
     @MessageBody()
@@ -93,5 +55,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       `message_${payload.userFrom}_${payload.userTo}`,
       newMessage,
     );
-  } */
+  }
 }
