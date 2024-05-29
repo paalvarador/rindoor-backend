@@ -195,9 +195,9 @@ export class JobsService {
         'No se puede finalizar un trabajo no iniciado',
       );
 
-    if (findJob.professional.id !== finishJob.userId)
+    if (findJob.client.id !== finishJob.userId)
       throw new UnauthorizedException(
-        'Solo el profesional encargado puede finalizar',
+        'Solo el cliente encargado puede finalizar',
       );
 
     const findFinishJob = findJob.postulations.find(
