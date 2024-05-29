@@ -164,14 +164,10 @@ export class JobsService {
       return 0;
     });
 
-    const totalJobs = filterJobs.length;
-    const maxPages = Math.ceil(totalJobs / defaultLimit);
+    // const totalJobs = filterJobs.length;
+    // const maxPages = Math.ceil(totalJobs / defaultLimit);
     const paginatedJobs = filterJobs.slice(startIndex, endIndex);
-    return {
-      currentPage: defaultPage,
-      maxpages: maxPages,
-      jobs: paginatedJobs,
-    };
+    return paginatedJobs
   }
 
   async findJobByClient(clientId: string) {
