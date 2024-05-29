@@ -175,7 +175,7 @@ export class JobsController {
   }
 
   @ApiBearerAuth()
-  @Roles(Role.PROFESSIONAL)
+  @Roles(Role.CLIENT)
   @UseGuards(GuardToken, guardRoles)
   @Put('finish')
   finishJob(@Body() finishJob: FinishJob) {
