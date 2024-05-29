@@ -56,6 +56,7 @@ export class AuthService {
       province: user.province,
       address: user.address,
       rating: user.rating,
+      coord: user.coords
     };
     if (user.role === Role.CLIENT) {
       userPayload['jobs'] = JSON.stringify(user.jobsAsClient);
