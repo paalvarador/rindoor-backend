@@ -28,6 +28,8 @@ import {
   postulationJobUserNotFound,
   postulationNotFound,
   postulationValidationsErrors,
+  responsePostulationClosed,
+  userUnauthorized,
 } from './swaggerExample/postulation.swagger';
 import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/user/entities/Role.enum';
@@ -139,7 +141,31 @@ export class PostulationsController {
   // remove(@Param('id') id: string) {
   //   return this.postulationsService.remove(id);
   // }
-
+  @ApiResponse({
+    status: 200,
+    description: 'Cerrar Postulacion',
+    schema: {
+      example: responsePostulationClosed,
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Postulacion no encontrada',
+    schema: {
+      example: postulationNotFound,
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Usuario no autorizado',
+    schema: {
+      example: userUnauthorized,
+    },
+  })
+  @ApiOperation({
+    summary: 'Endpoint Para cerrar postulacion',
+    description: 'Cliente elige la postulacion, procediendo a cerrarla',
+  })
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
   @UseGuards(GuardToken, guardRoles)

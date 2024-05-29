@@ -89,6 +89,49 @@ export const postulationNotFound = {
   },
 };
 
+export const postulationClosed = {
+  status: 400,
+  description: 'Postulacion ya esta cerrada',
+  schema: {
+    example: {
+      message: 'Postulacion ya Cerrada',
+      error: 'Bad Request',
+      statusCode: 400,
+    },
+  },
+};
+
+export const responsePostulationClosed = {
+  message: 'Postulacion aceptada por el usuario',
+  job: {
+    id: '179b3890-6cc0-46a5-80b1-4c7edca71e50',
+    banned: true,
+    name: 'Limpiar la casa 3',
+    description: 'Descripcion del trabajo',
+    base_price: 200.2,
+    status: 'InProgress',
+    country: 'Argentina',
+    province: 'Buenos Aires',
+    city: 'Mercedes',
+    address: 'Calle 30 626',
+    coords: '-34.6487099,-59.4301548',
+    img: 'http://res.cloudinary.com/do66dg8ta/image/upload/v1716914591/kzhgcuwqeialpcwrqkvn.png',
+    created_at: '2024-05-28T19:43:12.309Z',
+  },
+};
+
+export const userUnauthorized = {
+  status: 401,
+  description: 'Usuario no autorizado',
+  schema: {
+    example: {
+      message: 'Usuario no autorizado',
+      error: 'Unauthorized',
+      statusCode: 401,
+    },
+  },
+};
+
 export const postulationApiParam = {
   name: 'id',
   description: 'Id de la postulación',
