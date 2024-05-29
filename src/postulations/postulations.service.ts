@@ -47,16 +47,7 @@ export class PostulationsService {
       throw new BadRequestException('Acesso solo para los Profesionales');
 
     if (findUser.subscriptionId === null)
-      return {
-        message: 'Profesional no tiene suscripcion',
-        user: {
-          id: findUser.id,
-          name: findUser.name,
-          role: findUser.role,
-          email: findUser.email,
-          suscription: findUser.subscriptionId,
-        },
-      };
+      throw new UnauthorizedException("Profesional sin Suscripcion no puede postularse")
 
     const findJob = await this.jobRepository.findOne({
       where: { id: createPostulationDto.jobId },
