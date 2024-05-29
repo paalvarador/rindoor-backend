@@ -200,18 +200,21 @@ export class JobsService {
         'No se puede finalizar un trabajo no iniciado',
       );
 
-    if (findJob.client.id !== finishJob.userId)
+    if (
+      findJob.client.id !== finishJob.userId &&
+      findJob.professional.id !== finishJob.userId
+    )
       throw new UnauthorizedException('Solo el cliente puede finalizar');
 
-    // if (findJob.professional.id === finishJob.userId) {
-    //   const findFinishJob = findJob.postulations.find(
-    //     (p) => p.user.id === finishJob.userId,
-    //   );
-    //   if (!findFinishJob)
-    //     throw new NotFoundException(
-    //       'Trabajo no encontrado para este profesional',
-    //     );
-    // }
+    if (findJob.professional.id === finishJob.userId) {
+      const findFinishJob = findJob.postulations.find(
+        (p) => p.user.id === finishJob.userId,
+      );
+      if (!findFinishJob)
+        throw new NotFoundException(
+          'Trabajo no encontrado para este profesional',
+        );
+    }
 
     await this.jobRepository.update(
       { id: findJob.id },
@@ -223,7 +226,7 @@ export class JobsService {
       new JobFinishedEvent(finishJob.jobId),
     );
 
-    return 'Job finished successfully by professional';
+    return 'Job finished successfully';
   }
 
   async findOne(id: string) {
