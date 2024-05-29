@@ -184,7 +184,12 @@ export class JobsService {
   async finishJob(finishJob: FinishJob) {
     const findJob = await this.jobRepository.findOne({
       where: { id: finishJob.jobId },
-      relations: ['postulations', 'postulations.user', 'professional'],
+      relations: [
+        'postulations',
+        'postulations.user',
+        'professional',
+        'client',
+      ],
     });
     if (!findJob) throw new NotFoundException('Trabajo no encontrado');
 
@@ -196,18 +201,17 @@ export class JobsService {
       );
 
     if (findJob.client.id !== finishJob.userId)
-      throw new UnauthorizedException(
-        'Solo el cliente encargado puede finalizar',
-      );
+      throw new UnauthorizedException('Solo el cliente puede finalizar');
 
-    const findFinishJob = findJob.postulations.find(
-      (p) => p.user.id === finishJob.userId,
-    );
-
-    if (!findFinishJob)
-      throw new NotFoundException(
-        'Trabajo no encontrado para este profesional',
-      );
+    // if (findJob.professional.id === finishJob.userId) {
+    //   const findFinishJob = findJob.postulations.find(
+    //     (p) => p.user.id === finishJob.userId,
+    //   );
+    //   if (!findFinishJob)
+    //     throw new NotFoundException(
+    //       'Trabajo no encontrado para este profesional',
+    //     );
+    // }
 
     await this.jobRepository.update(
       { id: findJob.id },
