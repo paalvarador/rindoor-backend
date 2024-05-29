@@ -339,7 +339,7 @@ export class JobsService {
     );
 
     const mail = {
-      to: userClientEmail,
+      to: [userClientEmail, findJobById.professional.email],
       subject: 'Trabajo Finalizado',
       text: '',
       template: template,
