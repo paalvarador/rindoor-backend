@@ -176,7 +176,6 @@ export class JobsController {
 
   @ApiBearerAuth()
   @Roles(Role.CLIENT)
-  @UseGuards(GuardToken, guardRoles)
   @Put('finish')
   finishJob(@Body() finishJob: FinishJob) {
     return this.jobsService.finishJob(finishJob);
