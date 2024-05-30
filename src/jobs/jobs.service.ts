@@ -115,7 +115,11 @@ export class JobsService {
       relations: { category: true },
     });
 
-    let filterJobs = jobs.filter(
+    const JobsActive = jobs.filter(
+      (job) => job.status === 'active' || job.status === 'InProgress',
+    );
+
+    let filterJobs = JobsActive.filter(
       (job) =>
         job.base_price >= defaultMinPrice && job.base_price <= defaultMaxPrice,
     );
@@ -167,7 +171,7 @@ export class JobsService {
     // const totalJobs = filterJobs.length;
     // const maxPages = Math.ceil(totalJobs / defaultLimit);
     const paginatedJobs = filterJobs.slice(startIndex, endIndex);
-    return paginatedJobs
+    return paginatedJobs;
   }
 
   async findJobByClient(clientId: string) {
